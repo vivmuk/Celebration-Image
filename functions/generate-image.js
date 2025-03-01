@@ -42,18 +42,17 @@ exports.handler = async function(event, context) {
         },
         data: {
           model: "fluently-xl",
-          prompt: `A high-quality 70s adult Japanese anime style illustration depicting a "${celebration}" scene. The image should show characters celebrating in a way that specifically relates to the occasion "${celebration}". At the top of the image, include a clear, prominent banner with the text "${greeting}" in stylized retro font. Use the authentic color palette and art style of 1970s anime with soft, muted tones. The banner should be very readable and integrated into the composition. The scene should clearly represent the specific celebration mentioned.`,
+          prompt: `A 70s adult Japanese anime style illustration depicting a "${celebration}" scene. The image should show characters celebrating in a way that specifically relates to the occasion "${celebration}". At the top of the image, include a clear, prominent banner with the text "${greeting}" in stylized retro font. Use the authentic color palette and art style of 1970s anime with soft, muted tones. The banner should be very readable and integrated into the composition. The scene should clearly represent the specific celebration mentioned.`,
           negative_prompt: "dark, gloomy, realistic, photorealistic, modern anime style, 3D, CGI, text that is blurry or illegible, childish, cartoonish",
-          style_preset: "Anime",
-          height: 1024,
-          width: 1024,
-          steps: 30,
+          height: 720,
+          width: 1280,
+          steps: 25,
           cfg_scale: 7.5,
           seed: Math.floor(Math.random() * 1000000),
           safe_mode: true,
           return_binary: false
         },
-        timeout: 60000 // 60 seconds timeout for larger images
+        timeout: 60000
       });
       
       console.log("Venice API response status:", veniceResponse.status);
