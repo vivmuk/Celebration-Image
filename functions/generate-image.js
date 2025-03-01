@@ -23,89 +23,54 @@ exports.handler = async function(event, context) {
       };
     }
     
-    // Log the API key (first few characters only for security)
-    const apiKey = "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j"; // Hardcoded for testing
-    console.log("Using API key directly in function for testing");
-    
     // Construct the greeting
     const greeting = `${celebration} ${person}`;
     
-    // Create a very simple prompt
-    const enhancedPrompt = `Anime style. "${greeting}" banner.`;
+    // Use a reliable placeholder image service
+    // Using Lorem Picsum which is very reliable
+    const placeholderImageUrl = `https://picsum.photos/seed/${encodeURIComponent(greeting)}/512/512`;
     
-    console.log("Generating image with prompt:", enhancedPrompt);
+    console.log("Using placeholder image URL:", placeholderImageUrl);
     
-    // Create a minimal API request payload
-    const payload = {
-      model: "fluently-xl",
-      prompt: enhancedPrompt,
-      height: 512,  // Smaller size for faster generation
-      width: 512    // Smaller size for faster generation
-    };
-    
-    console.log("Full request payload:", JSON.stringify(payload));
-    
+    // Try to make a test API call to Venice just to log the response
     try {
-      // Make the API call to Venice using axios with a longer timeout
-      const response = await axios({
-        method: 'post',
-        url: 'https://api.venice.ai/api/v1/image/generate',
+      const apiKey = "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j";
+      const testResponse = await axios({
+        method: 'get',
+        url: 'https://api.venice.ai/api/v1/models',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${apiKey}`
         },
-        data: payload,
-        timeout: 25000  // 25 seconds timeout
+        timeout: 5000
       });
       
-      console.log("API Response Status:", response.status);
-      console.log("API Response Data:", JSON.stringify(response.data, null, 2));
-      
-      // For debugging, log the entire response structure
-      console.log("Full response structure:", Object.keys(response.data));
-      
-      // Since the Venice API is not returning a valid image URL, let's use a placeholder image
-      // This is a temporary solution until we can fix the API integration
-      const placeholderImageUrl = `https://via.placeholder.com/512x512.png?text=${encodeURIComponent(greeting)}`;
-      
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ 
-          imageUrl: placeholderImageUrl,
-          message: "Using a placeholder image for now. The Venice API integration needs further debugging.",
-          rawResponse: response.data
-        })
-      };
-      
-    } catch (apiError) {
-      console.error("API call failed:", apiError.message);
-      
-      // If the API call fails, use a placeholder image
-      const placeholderImageUrl = `https://via.placeholder.com/512x512.png?text=${encodeURIComponent(greeting)}`;
-      
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ 
-          imageUrl: placeholderImageUrl,
-          error: "API call failed: " + apiError.message,
-          message: "Using a placeholder image due to API error."
-        })
-      };
+      console.log("Venice API test response:", testResponse.status);
+    } catch (testError) {
+      console.log("Venice API test failed:", testError.message);
     }
+    
+    // Return the placeholder image URL
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ 
+        imageUrl: placeholderImageUrl,
+        message: "Using a placeholder image for now. The Venice API integration needs further debugging.",
+        greeting: greeting
+      })
+    };
     
   } catch (error) {
     console.error('Error:', error.message);
     
-    // Use a placeholder image as a fallback
-    const greeting = "Error";
-    const placeholderImageUrl = `https://via.placeholder.com/512x512.png?text=${encodeURIComponent(greeting)}`;
+    // Use a default placeholder image as a fallback
+    const placeholderImageUrl = `https://picsum.photos/512/512`;
     
     return {
       statusCode: 500,
       body: JSON.stringify({ 
         imageUrl: placeholderImageUrl,
-        error: 'Failed to generate image: ' + error.message,
-        message: "Using a placeholder image due to error."
+        error: 'Failed to process request: ' + error.message,
+        message: "Using a default placeholder image due to error."
       })
     };
   }
