@@ -3,6 +3,10 @@
 
 [functions]
   node_bundler = "esbuild"
+  included_files = ["node_modules/axios/**"]
+  
+[functions.generate-image]
+  timeout = 30
 
 [[redirects]]
   from = "/*"

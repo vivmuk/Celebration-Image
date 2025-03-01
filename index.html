@@ -76,6 +76,14 @@
             box-shadow: 0 0 0 #cd5c5c;
         }
         
+        button:disabled {
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+            box-shadow: none;
+            top: 0;
+        }
+        
         #result {
             margin-top: 40px;
             text-align: center;
@@ -152,6 +160,12 @@
             margin-bottom: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+        
+        .loading-message {
+            margin-top: 10px;
+            font-size: 1em;
+            color: #8b4513;
+        }
     </style>
 </head>
 <body>
@@ -173,6 +187,9 @@
                 <div class="progress-bar" id="progress-bar"></div>
                 <div class="progress-text" id="progress-text">0%</div>
             </div>
+            <div class="loading-message" id="loading-message">
+                Creating your groovy anime image... This might take up to 30 seconds!
+            </div>
         </div>
     </div>
     
@@ -180,12 +197,14 @@
 
     <script>
         document.getElementById('generate').addEventListener('click', async function() {
+            const generateButton = document.getElementById('generate');
             const celebration = document.getElementById('celebration').value.trim();
             const person = document.getElementById('person').value.trim();
             const resultDiv = document.getElementById('result');
             const progressArea = document.getElementById('progress-area');
             const progressBar = document.getElementById('progress-bar');
             const progressText = document.getElementById('progress-text');
+            const loadingMessage = document.getElementById('loading-message');
             
             // Validate inputs
             if (!celebration || !person) {
@@ -193,26 +212,49 @@
                 return;
             }
             
-            // Show loading message and progress bar
+            // Disable button and show loading
+            generateButton.disabled = true;
             resultDiv.innerHTML = '<p class="loading">Generating your groovy anime celebration image... Please wait!</p>';
             progressArea.style.display = 'block';
             
+            // Set up messages for longer wait times
+            const loadingMessages = [
+                "Creating your groovy anime image... This might take up to 30 seconds!",
+                "Still working on your masterpiece... Anime art takes time!",
+                "Almost there! Adding those vintage 70s vibes...",
+                "Putting the finishing touches on your celebration image..."
+            ];
+            
             // Simulate progress since we can't get real-time progress from the API
             let progress = 0;
+            let messageIndex = 0;
+            
             const progressInterval = setInterval(() => {
-                progress += Math.random() * 5;
+                // Gradually increase progress
+                if (progress < 20) {
+                    progress += 0.5;
+                } else if (progress < 60) {
+                    progress += 0.3;
+                } else if (progress < 90) {
+                    progress += 0.1;
+                } else {
+                    progress += 0.05;
+                }
+                
                 if (progress > 95) {
                     progress = 95; // Cap at 95% until we get the actual result
                 }
+                
+                // Update progress bar and text
                 progressBar.style.width = progress + '%';
                 progressText.innerText = Math.round(progress) + '%';
+                
+                // Update loading message every 7 seconds
+                if (Math.floor(progress / 25) > messageIndex && messageIndex < loadingMessages.length - 1) {
+                    messageIndex++;
+                    loadingMessage.textContent = loadingMessages[messageIndex];
+                }
             }, 300);
-            
-            // Construct the greeting
-            const greeting = `${celebration} ${person}`;
-            
-            // Construct the prompt
-            const prompt = `70s Japanese Anime style image featuring adults celebrating a ${celebration} event. Include a banner at the top with the greeting "${greeting}". Vibrant colors, retro anime style from the 1970s.`;
             
             try {
                 // Call our Netlify serverless function
@@ -223,8 +265,7 @@
                     },
                     body: JSON.stringify({
                         celebration: celebration,
-                        person: person,
-                        prompt: prompt
+                        person: person
                     })
                 });
                 
@@ -242,9 +283,9 @@
                     resultDiv.innerHTML = `
                         <div class="anime-border">
                             <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
-                                Your "${greeting}" Celebration Image:
+                                Your "${celebration} ${person}" Celebration Image:
                             </h3>
-                            <img src="${data.imageUrl}" alt="${greeting} celebration image">
+                            <img src="${data.imageUrl}" alt="${celebration} ${person} celebration image">
                         </div>
                     `;
                 } else {
@@ -253,9 +294,12 @@
                 }
             } catch (error) {
                 clearInterval(progressInterval);
-                progressArea.style.display = 'none';
                 console.error('Error:', error);
                 resultDiv.innerHTML = `<p class="error">Error: ${error.message || 'Something went wrong'}</p>`;
+            } finally {
+                // Re-enable button and hide progress area
+                generateButton.disabled = false;
+                progressArea.style.display = 'none';
             }
         });
     </script>
