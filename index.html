@@ -166,6 +166,19 @@
             font-size: 1em;
             color: #8b4513;
         }
+        
+        .image-container {
+            margin: 20px auto;
+            max-width: 512px;
+            text-align: center;
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -285,21 +298,34 @@
                 if (data.imageUrl) {
                     console.log("Image URL found:", data.imageUrl);
                     
+                    // Create a new image element to test loading
+                    const testImage = new Image();
+                    testImage.onload = function() {
+                        console.log("Image loaded successfully");
+                    };
+                    testImage.onerror = function() {
+                        console.error("Error loading image from URL:", data.imageUrl);
+                    };
+                    testImage.src = data.imageUrl;
+                    
                     // Display the generated image
                     resultDiv.innerHTML = `
                         <div class="anime-border">
                             <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
                                 Your "${celebration} ${person}" Celebration Image:
                             </h3>
-                            <img src="${data.imageUrl}" alt="${celebration} ${person} celebration image">
+                            <div class="image-container">
+                                <img src="${data.imageUrl}" alt="${celebration} ${person} celebration image">
+                            </div>
                             <div style="margin-top: 20px; text-align: center;">
                                 <a href="${data.imageUrl}" download="${celebration}_${person}.png" 
                                    style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
                                           text-decoration: none; border-radius: 10px; font-family: 'Bangers', cursive; 
                                           font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c;">
-                                    ⬇️ Download Image
+                                    ⬇️ DOWNLOAD IMAGE
                                 </a>
                             </div>
+                            ${data.message ? `<p style="margin-top: 15px; color: #8b4513; font-style: italic;">${data.message}</p>` : ''}
                         </div>
                     `;
                 } else {
