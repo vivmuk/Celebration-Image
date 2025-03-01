@@ -24,20 +24,28 @@ exports.handler = async function(event, context) {
     const apiKey = process.env.VENICE_API_KEY || '';
     console.log("API Key first 5 chars:", apiKey.substring(0, 5));
     console.log("API Key length:", apiKey.length);
-    console.log("Generating image with prompt:", prompt);
     
-    // Create the API request payload
+    // Construct the greeting
+    const greeting = `${celebration} ${person}`;
+    
+    // Create a more specific prompt focusing on 70s Japanese adult anime style
+    const enhancedPrompt = `1970s Japanese adult anime style image featuring adults celebrating a ${celebration} event. 
+    Prominent decorative banner at the top of the image with the text "${greeting}" in bold, colorful lettering. 
+    Vintage anime art style from the 1970s with vibrant colors, hand-drawn animation look, and simple backgrounds. 
+    The banner should be very clear and readable at the top of the image.`;
+    
+    console.log("Generating image with prompt:", enhancedPrompt);
+    
+    // Create the API request payload without style_preset
     const payload = {
       model: "fluently-xl",
-      prompt: prompt,
-      negative_prompt: "Clouds, Rain, Snow, Modern style, 3D, photorealistic",
-      style_preset: "70s Japanese Anime",
+      prompt: enhancedPrompt,
+      negative_prompt: "Clouds, Rain, Snow, Modern style, 3D, photorealistic, children, childish style, modern anime, detailed faces",
       height: 1024,
       width: 1024,
       steps: 30,
-      cfg_scale: 7.5,
+      cfg_scale: 8.0, // Slightly increased for more prompt adherence
       seed: Math.floor(Math.random() * 1000000),
-      lora_strength: 50,
       safe_mode: false,
       return_binary: false,
       hide_watermark: false
