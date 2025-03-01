@@ -26,39 +26,87 @@ exports.handler = async function(event, context) {
     // Construct the greeting
     const greeting = `${celebration} ${person}`;
     
-    // Use a reliable placeholder image service
-    // Using Lorem Picsum which is very reliable
-    const placeholderImageUrl = `https://picsum.photos/seed/${encodeURIComponent(greeting)}/512/512`;
+    // Your Venice API key
+    const apiKey = process.env.VENICE_API_KEY || "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j";
     
-    console.log("Using placeholder image URL:", placeholderImageUrl);
+    console.log("Making API call to Venice with greeting:", greeting);
     
-    // Try to make a test API call to Venice just to log the response
+    // Make the API call to Venice for image generation
     try {
-      const apiKey = "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j";
-      const testResponse = await axios({
-        method: 'get',
-        url: 'https://api.venice.ai/api/v1/models',
+      const veniceResponse = await axios({
+        method: 'post',
+        url: 'https://api.venice.ai/api/v1/image/generate',
         headers: {
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
         },
-        timeout: 5000
+        data: {
+          model: "fluently-xl",
+          prompt: `A vibrant 70s anime-style celebration image with "${greeting}" text prominently displayed. The image should have a retro anime aesthetic with bright colors, sparkles, and a festive atmosphere.`,
+          negative_prompt: "dark, gloomy, realistic, photorealistic",
+          style_preset: "Anime",
+          height: 512,
+          width: 512,
+          steps: 30,
+          cfg_scale: 7.5,
+          seed: Math.floor(Math.random() * 1000000),
+          safe_mode: true,
+          return_binary: false
+        },
+        timeout: 30000 // 30 seconds timeout
       });
       
-      console.log("Venice API test response:", testResponse.status);
-    } catch (testError) {
-      console.log("Venice API test failed:", testError.message);
+      console.log("Venice API response status:", veniceResponse.status);
+      
+      // Check if we have images in the response
+      if (veniceResponse.data && veniceResponse.data.images && veniceResponse.data.images.length > 0) {
+        const imageBase64 = veniceResponse.data.images[0];
+        // The API returns base64 data, so we need to construct a data URL
+        const imageUrl = `data:image/png;base64,${imageBase64}`;
+        
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ 
+            imageUrl: imageUrl,
+            greeting: greeting,
+            message: "Image generated successfully!"
+          })
+        };
+      } else {
+        console.log("No images found in Venice API response:", JSON.stringify(veniceResponse.data));
+        
+        // Fallback to placeholder image
+        const placeholderImageUrl = `https://picsum.photos/seed/${encodeURIComponent(greeting)}/512/512`;
+        
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ 
+            imageUrl: placeholderImageUrl,
+            greeting: greeting,
+            message: "Using a placeholder image. The Venice API did not return an image."
+          })
+        };
+      }
+    } catch (apiError) {
+      console.error("Venice API error:", apiError.message);
+      
+      // If we have a response from the API, log it
+      if (apiError.response) {
+        console.error("Venice API error response:", JSON.stringify(apiError.response.data));
+      }
+      
+      // Fallback to placeholder image
+      const placeholderImageUrl = `https://picsum.photos/seed/${encodeURIComponent(greeting)}/512/512`;
+      
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ 
+          imageUrl: placeholderImageUrl,
+          greeting: greeting,
+          message: "Using a placeholder image. The Venice API returned an error: " + apiError.message
+        })
+      };
     }
-    
-    // Return the placeholder image URL
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ 
-        imageUrl: placeholderImageUrl,
-        message: "Using a placeholder image for now. The Venice API integration needs further debugging.",
-        greeting: greeting
-      })
-    };
-    
   } catch (error) {
     console.error('Error:', error.message);
     
