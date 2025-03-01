@@ -42,14 +42,14 @@ exports.handler = async function(event, context) {
         },
         data: {
           model: "fluently-xl",
-          prompt: `A 70s adult Japanese anime style illustration depicting a "${celebration}" scene. The image should show characters celebrating in a way that specifically relates to the occasion "${celebration}". At the top of the image, include a clear, prominent banner with the text "${greeting}" in stylized retro font. Use the authentic color palette and art style of 1970s anime with soft, muted tones. The banner should be very readable and integrated into the composition. The scene should clearly represent the specific celebration mentioned.`,
-          negative_prompt: "dark, gloomy, realistic, photorealistic, modern anime style, 3D, CGI, text that is blurry or illegible, childish, cartoonish",
+          prompt: `A clear, vibrant 70s Japanese anime style illustration depicting a "${celebration}" scene. The image should show fully-clothed characters celebrating in a way that specifically relates to the occasion "${celebration}". At the top of the image, include a clear, prominent banner with the text "${greeting}" in stylized retro font. Use the authentic color palette and art style of 1970s anime. The banner should be very readable and integrated into the composition. The scene should clearly represent the specific celebration mentioned. All characters must be appropriately and fully dressed for a family-friendly image.`,
+          negative_prompt: "blurry, hazy, low quality, low resolution, fuzzy, out of focus, censored, pixelated, watermark, nudity, revealing clothing, inappropriate content, adult content, nsfw, sexual content, suggestive poses",
           height: 720,
           width: 1280,
-          steps: 25,
-          cfg_scale: 7.5,
+          steps: 30,
+          cfg_scale: 8.5,
           seed: Math.floor(Math.random() * 1000000),
-          safe_mode: true,
+          safe_mode: false,
           return_binary: false
         },
         timeout: 60000
