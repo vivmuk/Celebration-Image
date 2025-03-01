@@ -171,6 +171,7 @@
             margin: 20px auto;
             max-width: 512px;
             text-align: center;
+            position: relative;
         }
         
         .image-container img {
@@ -178,6 +179,28 @@
             height: auto;
             display: block;
             margin: 0 auto;
+        }
+        
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 0;
+            background-color: rgba(255, 99, 71, 0.8);
+            color: white;
+            font-family: 'Bangers', cursive;
+            font-size: 24px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        
+        .message {
+            margin-top: 15px;
+            color: #8b4513;
+            font-style: italic;
+            text-align: center;
         }
     </style>
 </head>
@@ -298,48 +321,30 @@
                 if (data.imageUrl) {
                     console.log("Image URL found:", data.imageUrl);
                     
-                    // Create a new image element to test loading
-                    const testImage = new Image();
-                    testImage.onload = function() {
-                        console.log("Image loaded successfully");
-                    };
-                    testImage.onerror = function() {
-                        console.error("Error loading image from URL:", data.imageUrl);
-                    };
-                    testImage.src = data.imageUrl;
-                    
-                    // Display the generated image
+                    // Display the generated image with overlay text
                     resultDiv.innerHTML = `
                         <div class="anime-border">
                             <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
                                 Your "${celebration} ${person}" Celebration Image:
                             </h3>
                             <div class="image-container">
-                                <img src="${data.imageUrl}" alt="${celebration} ${person} celebration image">
+                                <img src="${data.imageUrl}" alt="${celebration} ${person} celebration image" crossorigin="anonymous">
+                                <div class="image-overlay">${celebration} ${person}</div>
                             </div>
                             <div style="margin-top: 20px; text-align: center;">
-                                <a href="${data.imageUrl}" download="${celebration}_${person}.png" 
+                                <a href="${data.imageUrl}" download="${celebration}_${person}.jpg" target="_blank"
                                    style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
                                           text-decoration: none; border-radius: 10px; font-family: 'Bangers', cursive; 
                                           font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c;">
                                     ⬇️ DOWNLOAD IMAGE
                                 </a>
                             </div>
-                            ${data.message ? `<p style="margin-top: 15px; color: #8b4513; font-style: italic;">${data.message}</p>` : ''}
+                            ${data.message ? `<p class="message">${data.message}</p>` : ''}
                         </div>
                     `;
                 } else {
-                    // Display error message with raw response for debugging
-                    console.error("No image URL in response:", data);
-                    resultDiv.innerHTML = `
-                        <p class="error">
-                            Error: ${data.error || 'Failed to generate image'}<br><br>
-                            <details>
-                                <summary>Technical Details (click to expand)</summary>
-                                <pre style="text-align: left; overflow: auto; max-height: 200px;">${JSON.stringify(data.rawResponse || data, null, 2)}</pre>
-                            </details>
-                        </p>
-                    `;
+                    // Display error message
+                    resultDiv.innerHTML = `<p class="error">Error: ${data.error || 'Failed to generate image'}</p>`;
                 }
             } catch (error) {
                 clearInterval(progressInterval);
