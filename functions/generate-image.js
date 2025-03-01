@@ -2,6 +2,9 @@
 const axios = require('axios');
 
 exports.handler = async function(event, context) {
+  // Tell Netlify not to close the function prematurely
+  context.callbackWaitsForEmptyEventLoop = false;
+  
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -10,10 +13,10 @@ exports.handler = async function(event, context) {
   try {
     // Parse the request body
     const body = JSON.parse(event.body);
-    const { celebration, person, prompt } = body;
+    const { celebration, person } = body;
     
     // Validate inputs
-    if (!celebration || !person || !prompt) {
+    if (!celebration || !person) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'Missing required fields' })
@@ -28,33 +31,24 @@ exports.handler = async function(event, context) {
     // Construct the greeting
     const greeting = `${celebration} ${person}`;
     
-    // Create a more specific prompt focusing on 70s Japanese adult anime style
-    const enhancedPrompt = `1970s Japanese adult anime style image featuring adults celebrating a ${celebration} event. 
-    Prominent decorative banner at the top of the image with the text "${greeting}" in bold, colorful lettering. 
-    Vintage anime art style from the 1970s with vibrant colors, hand-drawn animation look, and simple backgrounds. 
-    The banner should be very clear and readable at the top of the image.`;
+    // Create a prompt that balances detail with simplicity
+    const enhancedPrompt = `1970s Japanese anime style image. Adults celebrating with a "${greeting}" banner at the top. Vintage hand-drawn animation look with vibrant colors.`;
     
     console.log("Generating image with prompt:", enhancedPrompt);
     
-    // Create the API request payload without style_preset
+    // Create a simplified API request payload
     const payload = {
       model: "fluently-xl",
       prompt: enhancedPrompt,
-      negative_prompt: "Clouds, Rain, Snow, Modern style, 3D, photorealistic, children, childish style, modern anime, detailed faces",
+      negative_prompt: "children, modern style, 3D, photorealistic",
       height: 1024,
       width: 1024,
-      steps: 30,
-      cfg_scale: 8.0, // Slightly increased for more prompt adherence
-      seed: Math.floor(Math.random() * 1000000),
-      safe_mode: false,
-      return_binary: false,
-      hide_watermark: false
+      steps: 25  // Reduced steps for faster generation
     };
     
-    // Log the full request for debugging
     console.log("Full request payload:", JSON.stringify(payload));
     
-    // Make the API call to Venice using axios
+    // Make the API call to Venice using axios with a longer timeout
     const response = await axios({
       method: 'post',
       url: 'https://api.venice.ai/api/v1/image/generate',
@@ -62,11 +56,11 @@ exports.handler = async function(event, context) {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      data: payload
+      data: payload,
+      timeout: 25000  // 25 seconds timeout
     });
     
     console.log("API Response Status:", response.status);
-    console.log("API Response Data:", JSON.stringify(response.data, null, 2));
     
     // Return the image URL or error to the client
     return {
@@ -80,6 +74,16 @@ exports.handler = async function(event, context) {
     
   } catch (error) {
     console.error('Error:', error.message);
+    
+    // Check if it's a timeout error
+    if (error.code === 'ECONNABORTED') {
+      return {
+        statusCode: 504,
+        body: JSON.stringify({ 
+          error: 'The image is taking longer than expected to generate. Please try again.'
+        })
+      };
+    }
     
     // Check if it's an API error with a response
     if (error.response) {
@@ -99,7 +103,7 @@ exports.handler = async function(event, context) {
     return {
       statusCode: 500,
       body: JSON.stringify({ 
-        error: 'Internal Server Error: ' + error.message
+        error: 'Failed to generate image: ' + error.message
       })
     };
   }
