@@ -1,4 +1,5 @@
-const fetch = require('node-fetch');
+// Use axios instead of fetch for better compatibility
+const axios = require('axios');
 
 exports.handler = async function(event, context) {
   // Only allow POST requests
@@ -45,49 +46,52 @@ exports.handler = async function(event, context) {
     // Log the full request for debugging
     console.log("Full request payload:", JSON.stringify(payload));
     
-    // Make the API call to Venice
-    const response = await fetch('https://api.venice.ai/api/v1/image/generate', {
-      method: 'POST',
+    // Make the API call to Venice using axios
+    const response = await axios({
+      method: 'post',
+      url: 'https://api.venice.ai/api/v1/image/generate',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      data: payload
     });
     
-    // Get the response as text first for debugging
-    const responseText = await response.text();
-    console.log("Raw API Response:", responseText);
-    
-    // Try to parse as JSON if possible
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      data = { error: "Could not parse response as JSON", rawResponse: responseText };
-    }
-    
-    console.log("Parsed API Response:", JSON.stringify(data, null, 2));
+    console.log("API Response Status:", response.status);
+    console.log("API Response Data:", JSON.stringify(response.data, null, 2));
     
     // Return the image URL or error to the client
     return {
-      statusCode: response.status,
+      statusCode: 200,
       body: JSON.stringify({ 
-        imageUrl: data.imageUrl || data.image_url || (data.images && data.images[0] ? data.images[0].url : null),
-        error: data.error || null,
-        status: response.status,
-        statusText: response.statusText,
-        details: "Please check the API key and Venice API documentation."
+        imageUrl: response.data.imageUrl || response.data.image_url || 
+                 (response.data.images && response.data.images[0] ? response.data.images[0].url : null),
+        error: response.data.error || null
       })
     };
     
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error:', error.message);
+    
+    // Check if it's an API error with a response
+    if (error.response) {
+      console.error('API Error Status:', error.response.status);
+      console.error('API Error Data:', JSON.stringify(error.response.data, null, 2));
+      
+      return {
+        statusCode: error.response.status,
+        body: JSON.stringify({ 
+          error: 'API Error: ' + (error.response.data.error || error.response.statusText),
+          details: error.response.data
+        })
+      };
+    }
+    
+    // Otherwise return a generic error
     return {
       statusCode: 500,
       body: JSON.stringify({ 
-        error: 'Internal Server Error: ' + error.message,
-        stack: error.stack
+        error: 'Internal Server Error: ' + error.message
       })
     };
   }
