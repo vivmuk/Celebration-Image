@@ -33,6 +33,7 @@ exports.handler = async function(event, context) {
     
     // Make the API call to Venice for image generation
     try {
+      // Simplified API call based on the example documentation
       const veniceResponse = await axios({
         method: 'post',
         url: 'https://api.venice.ai/api/v1/image/generate',
@@ -42,17 +43,18 @@ exports.handler = async function(event, context) {
         },
         data: {
           model: "fluently-xl",
-          prompt: `A clear, vibrant 70s Japanese anime style illustration depicting a "${celebration}" scene. The image should show fully-clothed characters celebrating in a way that specifically relates to the occasion "${celebration}". At the top of the image, include a clear, prominent banner with the text "${greeting}" in stylized retro font. Use the authentic color palette and art style of 1970s anime. The banner should be very readable and integrated into the composition. The scene should clearly represent the specific celebration mentioned. All characters must be appropriately and fully dressed for a family-friendly image.`,
-          negative_prompt: "blurry, hazy, low quality, low resolution, fuzzy, out of focus, censored, pixelated, watermark, nudity, revealing clothing, inappropriate content, adult content, nsfw, sexual content, suggestive poses",
+          prompt: `A 70s anime style illustration showing a "${celebration}" celebration scene with characters. Include a banner with text "${greeting}" in retro font. Use vibrant colors typical of 1970s anime.`,
+          negative_prompt: "blurry, low quality",
           height: 720,
           width: 1280,
-          steps: 25,
-          cfg_scale: 8.5,
+          steps: 15,
+          cfg_scale: 7.5,
           seed: Math.floor(Math.random() * 1000000),
           safe_mode: false,
-          return_binary: false
+          return_binary: false,
+          hide_watermark: false
         },
-        timeout: 60000
+        timeout: 60000 // 60 seconds timeout
       });
       
       console.log("Venice API response status:", veniceResponse.status);
@@ -75,7 +77,7 @@ exports.handler = async function(event, context) {
         console.log("No images found in Venice API response:", JSON.stringify(veniceResponse.data));
         
         // Fallback to placeholder image
-        const placeholderImageUrl = `https://picsum.photos/seed/${encodeURIComponent(greeting)}/512/512`;
+        const placeholderImageUrl = `https://picsum.photos/seed/${encodeURIComponent(greeting)}/1280/720`;
         
         return {
           statusCode: 200,
@@ -95,7 +97,7 @@ exports.handler = async function(event, context) {
       }
       
       // Fallback to placeholder image
-      const placeholderImageUrl = `https://picsum.photos/seed/${encodeURIComponent(greeting)}/512/512`;
+      const placeholderImageUrl = `https://picsum.photos/seed/${encodeURIComponent(greeting)}/1280/720`;
       
       return {
         statusCode: 200,
@@ -110,7 +112,7 @@ exports.handler = async function(event, context) {
     console.error('Error:', error.message);
     
     // Use a default placeholder image as a fallback
-    const placeholderImageUrl = `https://picsum.photos/512/512`;
+    const placeholderImageUrl = `https://picsum.photos/1280/720`;
     
     return {
       statusCode: 500,
