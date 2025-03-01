@@ -24,26 +24,23 @@ exports.handler = async function(event, context) {
     }
     
     // Log the API key (first few characters only for security)
-    const apiKey = process.env.VENICE_API_KEY || '';
-    console.log("API Key first 5 chars:", apiKey.substring(0, 5));
-    console.log("API Key length:", apiKey.length);
+    const apiKey = "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j"; // Hardcoded for testing
+    console.log("Using API key directly in function for testing");
     
     // Construct the greeting
     const greeting = `${celebration} ${person}`;
     
-    // Create a prompt that balances detail with simplicity
-    const enhancedPrompt = `1970s Japanese anime style image. Adults celebrating with a "${greeting}" banner at the top. Vintage hand-drawn animation look with vibrant colors.`;
+    // Create a very simple prompt
+    const enhancedPrompt = `Anime style. "${greeting}" banner.`;
     
     console.log("Generating image with prompt:", enhancedPrompt);
     
-    // Create a simplified API request payload
+    // Create a minimal API request payload
     const payload = {
       model: "fluently-xl",
       prompt: enhancedPrompt,
-      negative_prompt: "children, modern style, 3D, photorealistic",
-      height: 1024,
-      width: 1024,
-      steps: 25  // Reduced steps for faster generation
+      height: 512,  // Smaller size for faster generation
+      width: 512    // Smaller size for faster generation
     };
     
     console.log("Full request payload:", JSON.stringify(payload));
@@ -61,14 +58,47 @@ exports.handler = async function(event, context) {
     });
     
     console.log("API Response Status:", response.status);
+    console.log("API Response Data:", JSON.stringify(response.data, null, 2));
     
-    // Return the image URL or error to the client
+    // Extract the image URL from the response
+    let imageUrl = null;
+    
+    // Check all possible locations for the image URL
+    if (response.data) {
+      if (response.data.imageUrl) {
+        imageUrl = response.data.imageUrl;
+      } else if (response.data.image_url) {
+        imageUrl = response.data.image_url;
+      } else if (response.data.images && response.data.images.length > 0) {
+        if (response.data.images[0].url) {
+          imageUrl = response.data.images[0].url;
+        } else if (typeof response.data.images[0] === 'string') {
+          imageUrl = response.data.images[0];
+        }
+      } else if (response.data.output && response.data.output.length > 0) {
+        imageUrl = response.data.output[0];
+      }
+    }
+    
+    console.log("Extracted Image URL:", imageUrl);
+    
+    if (!imageUrl) {
+      console.error("Could not find image URL in response:", response.data);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ 
+          error: 'Could not find image URL in API response',
+          rawResponse: response.data
+        })
+      };
+    }
+    
+    // Return the image URL to the client
     return {
       statusCode: 200,
       body: JSON.stringify({ 
-        imageUrl: response.data.imageUrl || response.data.image_url || 
-                 (response.data.images && response.data.images[0] ? response.data.images[0].url : null),
-        error: response.data.error || null
+        imageUrl: imageUrl,
+        rawResponse: response.data
       })
     };
     
