@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>70s Anime Celebration Generator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&display=swap');
+        
+        body {
+            font-family: 'Permanent Marker', cursive;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffebcd; /* Cream background */
+            color: #8b4513; /* Brown text */
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="none" stroke="%23ff6b6b" stroke-width="0.5" stroke-dasharray="2 4"/></svg>');
+        }
+        
+        h1 {
+            color: #ff6347; /* Tomato red */
+            text-align: center;
+            font-family: 'Bangers', cursive;
+            font-size: 3em;
+            text-shadow: 3px 3px 0px #ffd700, 5px 5px 0px #ff8c00;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+        
+        .description {
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.2em;
+            color: #ff6347;
+        }
+        
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        input {
+            padding: 15px;
+            border: 3px solid #ff6347;
+            border-radius: 10px;
+            font-size: 18px;
+            font-family: 'Permanent Marker', cursive;
+            background-color: #fff8dc; /* Light yellow */
+            color: #8b4513;
+        }
+        
+        button {
+            padding: 15px 20px;
+            background-color: #ff6347;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            font-family: 'Bangers', cursive;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 0 #cd5c5c;
+            position: relative;
+            top: 0;
+        }
+        
+        button:hover {
+            background-color: #ff4500;
+        }
+        
+        button:active {
+            top: 5px;
+            box-shadow: 0 0 0 #cd5c5c;
+        }
+        
+        #result {
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        img {
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border: 5px solid #ff6347;
+        }
+        
+        .loading {
+            color: #ff6347;
+            font-style: italic;
+            font-size: 1.2em;
+        }
+        
+        .error {
+            color: #ff0000;
+            font-weight: bold;
+            font-size: 1.2em;
+            background-color: #ffe4e1;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px dashed #ff0000;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #fff8dc;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 3px solid #ff6347;
+            height: 30px;
+            position: relative;
+        }
+        
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #ff6347;
+            transition: width 0.3s;
+            background-image: linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+            background-size: 40px 40px;
+            animation: progress-animation 2s linear infinite;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #8b4513;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #fff;
+        }
+        
+        @keyframes progress-animation {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 40px 0;
+            }
+        }
+        
+        .anime-border {
+            border: 5px solid #ff6347;
+            border-radius: 15px;
+            padding: 20px;
+            background-color: #fff8dc;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>70s Anime Celebration Generator</h1>
+    
+    <div class="description">
+        <p>✨ Generate a groovy 70s anime-style celebration image with your custom greeting! ✨</p>
+    </div>
+    
+    <div class="anime-border">
+        <div class="input-container">
+            <input type="text" id="celebration" placeholder="Name of the Celebration (e.g., Happy Birthday)" value="Happy Birthday">
+            <input type="text" id="person" placeholder="Name of the Person (e.g., Vivek)" value="Vivek">
+            <button id="generate">✨ Generate Anime Image ✨</button>
+        </div>
+        
+        <div id="progress-area" style="display: none;">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+                <div class="progress-text" id="progress-text">0%</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('generate').addEventListener('click', async function() {
+            const celebration = document.getElementById('celebration').value.trim();
+            const person = document.getElementById('person').value.trim();
+            const resultDiv = document.getElementById('result');
+            const progressArea = document.getElementById('progress-area');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            // Validate inputs
+            if (!celebration || !person) {
+                resultDiv.innerHTML = '<p class="error">Please fill in both fields!</p>';
+                return;
+            }
+            
+            // Show loading message and progress bar
+            resultDiv.innerHTML = '<p class="loading">Generating your groovy anime celebration image... Please wait!</p>';
+            progressArea.style.display = 'block';
+            
+            // Simulate progress since we can't get real-time progress from the API
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 5;
+                if (progress > 95) {
+                    progress = 95; // Cap at 95% until we get the actual result
+                }
+                progressBar.style.width = progress + '%';
+                progressText.innerText = Math.round(progress) + '%';
+            }, 300);
+            
+            // Construct the greeting
+            const greeting = `${celebration} ${person}`;
+            
+            // Construct the prompt
+            const prompt = `70s Japanese Anime style image featuring adults celebrating a ${celebration} event. Include a banner at the top with the greeting "${greeting}". Vibrant colors, retro anime style from the 1970s.`;
+            
+            try {
+                // Call our Netlify serverless function
+                const response = await fetch('/.netlify/functions/generate-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        celebration: celebration,
+                        person: person,
+                        prompt: prompt
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Complete the progress bar
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                progressText.innerText = '100%';
+                
+                console.log("API Response:", data);
+                
+                if (data.imageUrl) {
+                    // Display the generated image
+                    resultDiv.innerHTML = `
+                        <div class="anime-border">
+                            <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
+                                Your "${greeting}" Celebration Image:
+                            </h3>
+                            <img src="${data.imageUrl}" alt="${greeting} celebration image">
+                        </div>
+                    `;
+                } else {
+                    // Display error message
+                    resultDiv.innerHTML = `<p class="error">Error: ${data.error || 'Failed to generate image'}</p>`;
+                }
+            } catch (error) {
+                clearInterval(progressInterval);
+                progressArea.style.display = 'none';
+                console.error('Error:', error);
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message || 'Something went wrong'}</p>`;
+            }
+        });
+    </script>
+</body>
+</html> 

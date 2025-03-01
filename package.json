@@ -1,0 +1,8 @@
+{
+  "name": "anime-celebration-generator",
+  "version": "1.0.0",
+  "description": "70s Anime Celebration Image Generator",
+  "dependencies": {
+    "node-fetch": "^3.3.0"
+  }
+} 
