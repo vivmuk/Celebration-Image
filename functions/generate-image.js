@@ -46,7 +46,7 @@ exports.handler = async function(event, context) {
           negative_prompt: "blurry, hazy, low quality, low resolution, fuzzy, out of focus, censored, pixelated, watermark, nudity, revealing clothing, inappropriate content, adult content, nsfw, sexual content, suggestive poses",
           height: 720,
           width: 1280,
-          steps: 30,
+          steps: 25,
           cfg_scale: 8.5,
           seed: Math.floor(Math.random() * 1000000),
           safe_mode: false,
