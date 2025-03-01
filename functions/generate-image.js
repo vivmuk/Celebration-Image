@@ -23,7 +23,7 @@ exports.handler = async function(event, context) {
       };
     }
     
-    // Construct the greeting
+    // Construct the greeting - make sure to include both celebration and person
     const greeting = `${celebration} ${person}`;
     
     // Your Venice API key
@@ -43,8 +43,8 @@ exports.handler = async function(event, context) {
         },
         data: {
           model: "fluently-xl",
-          prompt: `A 70s anime style illustration showing a "${celebration}" celebration scene with characters. Include a banner with text "${greeting}" in retro font. Use vibrant colors typical of 1970s anime.`,
-          negative_prompt: "blurry, low quality",
+          prompt: `A 70s anime style illustration showing a "${celebration}" celebration scene with characters. Include a banner with text "${greeting}" in retro font. The banner must clearly show the complete text "${greeting}". Use vibrant colors typical of 1970s anime.`,
+          negative_prompt: "blurry, low quality, missing text, incomplete text",
           height: 720,
           width: 1280,
           steps: 15,
