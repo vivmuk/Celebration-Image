@@ -202,6 +202,20 @@
             font-style: italic;
             text-align: center;
         }
+        
+        .debug-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #333;
+            text-align: left;
+            white-space: pre-wrap;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -230,6 +244,7 @@
     </div>
     
     <div id="result"></div>
+    <div id="debug-info" class="debug-info"></div>
 
     <script>
         document.getElementById('generate').addEventListener('click', async function() {
@@ -241,6 +256,7 @@
             const progressBar = document.getElementById('progress-bar');
             const progressText = document.getElementById('progress-text');
             const loadingMessage = document.getElementById('loading-message');
+            const debugInfo = document.getElementById('debug-info');
             
             // Validate inputs
             if (!celebration || !person) {
@@ -252,6 +268,7 @@
             generateButton.disabled = true;
             resultDiv.innerHTML = '';
             progressArea.style.display = 'block';
+            debugInfo.style.display = 'none';
             
             // Set up messages for longer wait times
             const loadingMessages = [
@@ -318,10 +335,16 @@
                 
                 console.log("API Response:", data);
                 
+                // For debugging - show the raw response
+                debugInfo.textContent = JSON.stringify(data, null, 2);
+                
                 if (data.imageUrl) {
                     console.log("Image URL found:", data.imageUrl);
                     
-                    // Display the generated image with overlay text
+                    // Check if it's a data URL (base64)
+                    const isDataUrl = data.imageUrl.startsWith('data:');
+                    
+                    // Display the generated image
                     resultDiv.innerHTML = `
                         <div class="anime-border">
                             <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
@@ -329,27 +352,52 @@
                             </h3>
                             <div class="image-container">
                                 <img src="${data.imageUrl}" alt="${celebration} ${person} celebration image" crossorigin="anonymous">
-                                <div class="image-overlay">${celebration} ${person}</div>
                             </div>
                             <div style="margin-top: 20px; text-align: center;">
-                                <a href="${data.imageUrl}" download="${celebration}_${person}.jpg" target="_blank"
-                                   style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
-                                          text-decoration: none; border-radius: 10px; font-family: 'Bangers', cursive; 
-                                          font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c;">
-                                    ⬇️ DOWNLOAD IMAGE
-                                </a>
+                                ${isDataUrl ? `
+                                    <a href="${data.imageUrl}" download="${celebration}_${person}.png" target="_blank"
+                                       style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
+                                              text-decoration: none; border-radius: 10px; font-family: 'Bangers', cursive; 
+                                              font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c;">
+                                        ⬇️ DOWNLOAD IMAGE
+                                    </a>
+                                ` : `
+                                    <a href="${data.imageUrl}" target="_blank"
+                                       style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
+                                              text-decoration: none; border-radius: 10px; font-family: 'Bangers', cursive; 
+                                              font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c;">
+                                        🔍 VIEW FULL IMAGE
+                                    </a>
+                                `}
                             </div>
                             ${data.message ? `<p class="message">${data.message}</p>` : ''}
+                            <button id="show-debug" style="margin-top: 20px; background-color: #ccc; color: #333; font-size: 14px; padding: 5px 10px;">
+                                Show Technical Details
+                            </button>
                         </div>
                     `;
+                    
+                    // Add event listener to the debug button
+                    setTimeout(() => {
+                        const showDebugButton = document.getElementById('show-debug');
+                        if (showDebugButton) {
+                            showDebugButton.addEventListener('click', function() {
+                                debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+                                this.textContent = debugInfo.style.display === 'none' ? 'Show Technical Details' : 'Hide Technical Details';
+                            });
+                        }
+                    }, 100);
                 } else {
                     // Display error message
                     resultDiv.innerHTML = `<p class="error">Error: ${data.error || 'Failed to generate image'}</p>`;
+                    debugInfo.style.display = 'block';
                 }
             } catch (error) {
                 clearInterval(progressInterval);
                 console.error('Error:', error);
                 resultDiv.innerHTML = `<p class="error">Error: ${error.message || 'Something went wrong'}</p>`;
+                debugInfo.textContent = `Error: ${error.stack || error.message || 'Unknown error'}`;
+                debugInfo.style.display = 'block';
             } finally {
                 // Re-enable button and hide progress area
                 generateButton.disabled = false;
