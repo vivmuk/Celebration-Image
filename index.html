@@ -333,35 +333,20 @@
                     },
                     body: JSON.stringify({
                         model: "flux-dev",
-                        prompt: `A highly detailed, hand-painted illustration in the EXACT style of Hayao Miyazaki and Studio Ghibli films like "Spirited Away" and "My Neighbor Totoro", celebrating ${celebration}. 
+                        prompt: `A colorful Miyazaki/Studio Ghibli style illustration celebrating ${celebration}. 
 
-The scene MUST feature a bright teal blue sky with distinctive Ghibli-style fluffy white clouds, vibrant yellow fields of flowers (similar to those in "Howl's Moving Castle"), and rolling green mountains in the background with the characteristic Ghibli soft lighting and atmospheric perspective.
+The scene features a bright teal blue sky with fluffy white clouds, vibrant yellow fields of flowers, and green mountains in the background.
 
-At the very top of the image, there must be a large, bold, rectangular banner spanning the entire width. The banner should have a solid red background, and the text should be in bold, white, sans-serif font, centered clearly. The exact text on the banner must be: "${greeting}"
+At the top of the image, there is a red banner with white text that reads: "${greeting}"
 
-The central focus of the scene MUST be characters actively engaged in activities that directly relate to the "${celebration}" theme. The characters must be shown participating in appropriate activities for this specific celebration - not generic celebration activities.
+The main character, ${person}, is shown celebrating ${celebration} with friends in Ghibli style. The characters are engaged in activities specific to this celebration type.
 
-For example:
-- If it's "Happy Birthday", show characters with a birthday cake, presents, and party decorations
-- If it's "Hot Pot Day", show characters gathered around a steaming hot pot, cooking and eating together
-- If it's "Graduation", show characters in graduation attire with diplomas
-- If it's "New Year", show characters with traditional New Year decorations and foods
-- If it's a holiday, show the specific traditions and activities of that holiday
-
-The central character, ${person}, must be drawn in authentic Miyazaki style with large expressive eyes and distinctive Ghibli character design. They should be the main focus, actively participating in the specific ${celebration} activities. Include 3-4 supporting characters (humans and Ghibli-style creatures) interacting with the main character and participating in the celebration.
-
-Include iconic Ghibli elements like:
-- Magical creatures or spirits (similar to soot sprites or forest spirits) participating in or observing the celebration
-- Whimsical details like floating lanterns or magical sparkles
-- Rich, saturated colors with the signature Ghibli palette
-- Soft, dreamy lighting with attention to shadows and highlights
-
-The art style must have the clean lines, vibrant colors, and meticulous background details that define Studio Ghibli films, with special focus on the teal blue sky, yellow fields, and green mountains. The mood should feel joyful, magical and nostalgic, capturing the heartwarming quality that defines Miyazaki's work, especially his famous scenes of community and celebration.`,
-                        negative_prompt: "blurry, low quality, missing text, incorrect text, banner at bottom, 3D, photorealistic, missing banner, text unreadable, text cut off, banner too small, banner wrong color, dark colors, orange sky, brown fields, character not celebrating, western animation style, generic anime, missing characters, solo character, empty scene, realistic proportions, dark atmosphere, missing celebration elements, generic celebration, unrelated activities, characters not engaged in the specific celebration",
+The illustration has the whimsical, magical quality of Studio Ghibli films with clean lines and vibrant colors.`,
+                        negative_prompt: "blurry, low quality, missing text, incorrect text, banner at bottom, 3D, photorealistic, missing banner, text unreadable, text cut off, banner too small, banner wrong color",
                         height: 720,
                         width: 1280,
-                        steps: 20, // Increased to 20 for better quality
-                        cfg_scale: 9, // Increased for better prompt adherence
+                        steps: 15, // Reduced from 20 to 15 for faster processing
+                        cfg_scale: 8, // Slightly reduced from 9 to 8
                         seed: randomSeed,
                         safe_mode: false,
                         return_binary: false,
