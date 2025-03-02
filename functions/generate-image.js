@@ -42,7 +42,7 @@ exports.handler = async function(event, context) {
           'Content-Type': 'application/json'
         },
         data: {
-          model: "sdxl",
+          model: "flux-dev",
           prompt: `Studio Ghibli-style illustration of a ${celebration} celebration. Soft lighting, dreamy atmosphere, and whimsical details.
 
 A red rectangular banner at the top of the image with white text that reads "${greeting}".
