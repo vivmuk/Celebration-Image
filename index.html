@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>70s Anime Celebration Generator</title>
+    <title>Ghibli Celebration Generator</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Quicksand:wght@500;700&display=swap');
         
         body {
-            font-family: 'Permanent Marker', cursive;
-            max-width: 800px;
+            font-family: 'Nunito', sans-serif;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #ffebcd; /* Cream background */
-            color: #8b4513; /* Brown text */
-            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="none" stroke="%23ff6b6b" stroke-width="0.5" stroke-dasharray="2 4"/></svg>');
+            background-color: #f0f5f9; /* Soft sky blue background */
+            color: #5a6978; /* Muted blue-gray text */
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="none" stroke="%2387ceeb" stroke-width="0.5" stroke-dasharray="2 4"/></svg>');
         }
         
         h1 {
-            color: #ff6347; /* Tomato red */
+            color: #4a86e8; /* Ghibli blue */
             text-align: center;
-            font-family: 'Bangers', cursive;
-            font-size: 3em;
-            text-shadow: 3px 3px 0px #ffd700, 5px 5px 0px #ff8c00;
-            letter-spacing: 2px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 2.8em;
+            text-shadow: 2px 2px 0px #c7e5f6;
+            letter-spacing: 1px;
             margin-bottom: 30px;
         }
         
@@ -31,7 +31,7 @@
             margin-bottom: 30px;
             text-align: center;
             font-size: 1.2em;
-            color: #ff6347;
+            color: #5a6978;
         }
         
         .input-container {
@@ -43,42 +43,53 @@
         
         input {
             padding: 15px;
-            border: 3px solid #ff6347;
-            border-radius: 10px;
+            border: 2px solid #87ceeb; /* Soft sky blue */
+            border-radius: 20px; /* Rounder edges */
             font-size: 18px;
-            font-family: 'Permanent Marker', cursive;
-            background-color: #fff8dc; /* Light yellow */
-            color: #8b4513;
+            font-family: 'Nunito', sans-serif;
+            background-color: #ffffff; /* Clean white */
+            color: #5a6978;
+            box-shadow: 0 4px 6px rgba(135, 206, 235, 0.1); /* Subtle shadow */
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4a86e8;
+            box-shadow: 0 4px 12px rgba(74, 134, 232, 0.2);
         }
         
         button {
             padding: 15px 20px;
-            background-color: #ff6347;
+            background-color: #4a86e8; /* Ghibli blue */
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 20px; /* Rounder edges */
             cursor: pointer;
-            font-size: 20px;
-            font-family: 'Bangers', cursive;
+            font-size: 18px;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
             letter-spacing: 1px;
-            transition: all 0.3s;
-            box-shadow: 0 5px 0 #cd5c5c;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(74, 134, 232, 0.3);
             position: relative;
             top: 0;
         }
         
         button:hover {
-            background-color: #ff4500;
+            background-color: #3a76d8;
+            box-shadow: 0 6px 12px rgba(74, 134, 232, 0.4);
+            transform: translateY(-2px);
         }
         
         button:active {
-            top: 5px;
-            box-shadow: 0 0 0 #cd5c5c;
+            top: 2px;
+            box-shadow: 0 2px 3px rgba(74, 134, 232, 0.4);
         }
         
         button:disabled {
-            background-color: #cccccc;
-            color: #666666;
+            background-color: #c7e5f6;
+            color: #ffffff;
             cursor: not-allowed;
             box-shadow: none;
             top: 0;
@@ -91,43 +102,43 @@
         
         img {
             max-width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            border: 5px solid #ff6347;
+            border-radius: 20px; /* Rounder edges */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 4px solid white;
         }
         
         .loading {
-            color: #ff6347;
+            color: #4a86e8;
             font-style: italic;
             font-size: 1.2em;
         }
         
         .error {
-            color: #ff0000;
+            color: #e67c73;
             font-weight: bold;
             font-size: 1.2em;
-            background-color: #ffe4e1;
+            background-color: #fde9e8;
             padding: 15px;
-            border-radius: 10px;
-            border: 2px dashed #ff0000;
+            border-radius: 20px;
+            border: 2px solid #e67c73;
         }
         
         .progress-container {
             width: 100%;
-            background-color: #fff8dc;
-            border-radius: 10px;
+            background-color: #e6f4fa;
+            border-radius: 20px;
             margin: 20px 0;
             overflow: hidden;
-            border: 3px solid #ff6347;
-            height: 30px;
+            border: 2px solid #87ceeb;
+            height: 24px;
             position: relative;
         }
         
         .progress-bar {
             width: 0%;
             height: 100%;
-            background-color: #ff6347;
-            transition: width 0.3s;
+            background-color: #4a86e8;
+            transition: width 0.3s ease;
             background-image: linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
             background-size: 40px 40px;
             animation: progress-animation 2s linear infinite;
@@ -138,7 +149,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #8b4513;
+            color: #5a6978;
             font-weight: bold;
             text-shadow: 1px 1px 0 #fff;
         }
@@ -153,23 +164,23 @@
         }
         
         .anime-border {
-            border: 5px solid #ff6347;
-            border-radius: 15px;
-            padding: 20px;
-            background-color: #fff8dc;
+            border: none;
+            border-radius: 24px;
+            padding: 25px;
+            background-color: #ffffff;
             margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(135, 206, 235, 0.2);
         }
         
         .loading-message {
             margin-top: 10px;
             font-size: 1em;
-            color: #8b4513;
+            color: #5a6978;
         }
         
         .image-container {
             margin: 20px auto;
-            max-width: 512px;
+            max-width: 800px;
             text-align: center;
             position: relative;
         }
@@ -179,6 +190,11 @@
             height: auto;
             display: block;
             margin: 0 auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .image-container img:hover {
+            transform: scale(1.02);
         }
         
         .image-overlay {
@@ -187,18 +203,18 @@
             left: 0;
             width: 100%;
             padding: 10px 0;
-            background-color: rgba(255, 99, 71, 0.8);
+            background-color: rgba(74, 134, 232, 0.8);
             color: white;
-            font-family: 'Bangers', cursive;
+            font-family: 'Quicksand', sans-serif;
             font-size: 24px;
             text-align: center;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
         
         .message {
             margin-top: 15px;
-            color: #8b4513;
+            color: #5a6978;
             font-style: italic;
             text-align: center;
         }
@@ -208,7 +224,7 @@
             padding: 10px;
             background-color: #f8f8f8;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 20px;
             font-family: monospace;
             font-size: 12px;
             color: #333;
@@ -216,20 +232,41 @@
             white-space: pre-wrap;
             display: none; /* Hide debug info by default */
         }
+        
+        .download-button {
+            display: inline-block; 
+            padding: 12px 24px; 
+            background-color: #4a86e8; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 20px; 
+            font-family: 'Quicksand', sans-serif; 
+            font-weight: 700;
+            font-size: 16px; 
+            letter-spacing: 1px; 
+            box-shadow: 0 4px 6px rgba(74, 134, 232, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .download-button:hover {
+            background-color: #3a76d8;
+            box-shadow: 0 6px 12px rgba(74, 134, 232, 0.4);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
-    <h1>70s Anime Celebration Generator</h1>
+    <h1>Ghibli Celebration Generator</h1>
     
     <div class="description">
-        <p>✨ Generate a groovy 70s anime-style celebration image with your custom greeting! ✨</p>
+        <p>✨ Create a magical Miyazaki-inspired celebration image with your custom greeting! ✨</p>
     </div>
     
     <div class="anime-border">
         <div class="input-container">
             <input type="text" id="celebration" placeholder="Enter celebration (e.g., Happy Birthday, Merry Christmas, Congratulations)" value="">
             <input type="text" id="person" placeholder="Enter name (e.g., Jon, Spanny, Jimmy)" value="">
-            <button id="generate">✨ Generate Anime Image ✨</button>
+            <button id="generate">✨ Generate Ghibli Image ✨</button>
         </div>
         
         <div id="progress-area" style="display: none;">
@@ -238,7 +275,7 @@
                 <div class="progress-text" id="progress-text">0%</div>
             </div>
             <div class="loading-message" id="loading-message">
-                Creating your groovy anime image... This might take up to 2 minutes!
+                Creating your magical Ghibli image... This might take up to 2 minutes!
             </div>
         </div>
     </div>
@@ -272,9 +309,9 @@
             
             // Set up messages for longer wait times
             const loadingMessages = [
-                "Creating your groovy anime image... This might take up to 2 minutes!",
-                "Still working on your masterpiece... 70s anime art with high quality takes time!",
-                "Almost there! Adding those vintage 70s vibes with extra detail...",
+                "Creating your magical Ghibli image... This might take up to 2 minutes!",
+                "Still working on your masterpiece... Ghibli art with high quality takes time!",
+                "Almost there! Adding those vintage Ghibli vibes with extra detail...",
                 "Putting the finishing touches on your celebration image... The wait will be worth it!"
             ];
             
