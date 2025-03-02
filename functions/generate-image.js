@@ -43,8 +43,12 @@ exports.handler = async function(event, context) {
         },
         data: {
           model: "fluently-xl",
-          prompt: `Split image: The top 20% of the image is a solid colored rectangle with the text "${greeting}" written in large, clear font. The bottom 80% shows a 70s anime style illustration of characters celebrating "${celebration}" with vibrant colors. The characters are wearing colorful 70s style clothing and have typical 70s anime features.`,
-          negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text",
+          prompt: `A vibrant Japanese anime-style illustration depicting a joyful ${celebration} scene. The setting reflects the theme of the celebration, with appropriate decorations, colors, and background elements. The main character, representing ${person}, is drawn in a detailed and expressive Japanese anime style, reminiscent of classic 70s anime, with natural proportions, soft shading, and a nostalgic, hand-drawn aesthetic.
+
+A large, clear banner is prominently displayed at the top of the image, with the exact text: '${greeting}' in a bold, legible, and aesthetically fitting font. The text should be completely clear and readable.
+
+The overall scene should fully capture the spirit of the celebration—such as balloons and a lively party for birthdays, a romantic setting for anniversaries, or confetti and applause for achievements. The colors, expressions, and atmosphere should evoke warmth, joy, and excitement, staying true to the nostalgic Japanese anime style with realistic character proportions.`,
+          negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text, text that is hard to read, banner at bottom, multiple banners, split text, exaggerated features, large eyes, chibi style",
           height: 720,
           width: 1280,
           steps: 20,
