@@ -260,12 +260,13 @@
     
     <div class="description">
         <p>✨ Create a magical Miyazaki-inspired celebration image with your custom greeting! ✨</p>
+        <p style="font-size: 0.9em; margin-top: 10px; color: #4a86e8;">Enter the celebration type (e.g., Birthday, Graduation, Christmas) and the person's name to generate a personalized Ghibli-style image.</p>
     </div>
     
     <div class="anime-border">
         <div class="input-container">
-            <input type="text" id="celebration" placeholder="Enter celebration (e.g., Happy Birthday, Merry Christmas, Congratulations)" value="">
-            <input type="text" id="person" placeholder="Enter name (e.g., Jon, Spanny, Jimmy)" value="">
+            <input type="text" id="celebration" placeholder="Enter celebration type (e.g., Birthday, Graduation, Christmas)" value="">
+            <input type="text" id="person" placeholder="Enter person's name (e.g., Vivek, Sarah, Michael)" value="">
             <button id="generate">✨ Generate Ghibli Image ✨</button>
         </div>
         
@@ -347,8 +348,27 @@
             }, 800); // Even slower updates for longer wait time
             
             try {
-                // Construct the greeting
-                const greeting = `${celebration} ${person}`;
+                // Format the greeting with "Happy" or appropriate prefix
+                let prefix = "Happy";
+                const celebrationLower = celebration.toLowerCase();
+                
+                // Choose appropriate prefix based on celebration type
+                if (celebrationLower.includes("congratulation") || celebrationLower.includes("congrats")) {
+                    prefix = ""; // Congratulations doesn't need a prefix
+                } else if (celebrationLower.includes("graduation") || celebrationLower.includes("achievement")) {
+                    prefix = "Congratulations on your";
+                } else if (celebrationLower.includes("anniversary")) {
+                    prefix = "Happy";
+                } else if (celebrationLower.includes("welcome")) {
+                    prefix = ""; // Welcome doesn't need a prefix
+                } else if (celebrationLower.includes("farewell") || celebrationLower.includes("goodbye")) {
+                    prefix = ""; // Farewell doesn't need a prefix
+                }
+                
+                // Construct the greeting with appropriate spacing
+                const greeting = prefix 
+                    ? `${prefix} ${celebration} ${person}!` 
+                    : `${celebration} ${person}!`;
                 
                 // Your Venice API key - replace with your actual API key
                 const apiKey = "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j"; // Replace with your actual API key
@@ -372,7 +392,7 @@
                         model: "flux-dev",
                         prompt: `Create a Hayao Miyazaki and Studio Ghibli style Japanese anime image depicting ${celebration} celebration with people.
 
-Create a medium-shot scene showing human characters from mid-torso up, with some background elements visible. The scene should be based highlighting the caracters doing the ${celebration} celebration.
+Create a medium-shot scene showing human characters from mid-torso up, with some background elements visible. The scene should be based on the ${celebration} celebration, with characters actively engaged in activities related to this specific celebration.
 
 A red banner at the top of the image with clear white text in English that reads the whole message: "${greeting}"
 
@@ -410,11 +430,11 @@ The scene should feature human characters with realistic proportions in the sign
                     // Display the generated image
                     resultDiv.innerHTML = `
                         <div class="anime-border">
-                            <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
-                                Your "${celebration} ${person}" Celebration Image:
+                            <h3 style="color: #4a86e8; font-family: 'Quicksand', sans-serif; font-size: 2em; text-align: center; margin-bottom: 20px;">
+                                Your "${greeting}" Celebration Image:
                             </h3>
                             <div class="image-container">
-                                <img src="${imageUrl}" alt="${celebration} ${person} celebration image" crossorigin="anonymous">
+                                <img src="${imageUrl}" alt="${greeting} celebration image" crossorigin="anonymous">
                             </div>
                             <div style="margin-top: 20px; text-align: center;">
                                 <a href="${imageUrl}" download="${celebration}_${person}.png" target="_blank"
@@ -434,10 +454,10 @@ The scene should feature human characters with realistic proportions in the sign
                     resultDiv.innerHTML = `
                         <div class="anime-border">
                             <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
-                                Your "${celebration} ${person}" Celebration Image:
+                                Your "${greeting}" Celebration Image:
                             </h3>
                             <div class="image-container">
-                                <img src="${placeholderImageUrl}" alt="${celebration} ${person} celebration image" crossorigin="anonymous">
+                                <img src="${placeholderImageUrl}" alt="${greeting} celebration image" crossorigin="anonymous">
                             </div>
                             <div style="margin-top: 20px; text-align: center;">
                                 <a href="${placeholderImageUrl}" target="_blank"
@@ -462,10 +482,10 @@ The scene should feature human characters with realistic proportions in the sign
                 resultDiv.innerHTML = `
                     <div class="anime-border">
                         <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
-                            Your "${celebration} ${person}" Celebration Image:
+                            Your "${greeting}" Celebration Image:
                         </h3>
                         <div class="image-container">
-                            <img src="${placeholderImageUrl}" alt="${celebration} ${person} celebration image" crossorigin="anonymous">
+                            <img src="${placeholderImageUrl}" alt="${greeting} celebration image" crossorigin="anonymous">
                         </div>
                         <div style="margin-top: 20px; text-align: center;">
                             <a href="${placeholderImageUrl}" target="_blank"
