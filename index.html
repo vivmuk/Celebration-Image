@@ -326,7 +326,25 @@
                 
                 console.log("Response received:", response.status);
                 
-                const data = await response.json();
+                // Add better error handling for JSON parsing
+                let data;
+                try {
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const responseText = await response.text();
+                    console.log("Raw response text:", responseText);
+                    
+                    if (!responseText || responseText.trim() === '') {
+                        throw new Error('Empty response received from server');
+                    }
+                    
+                    data = JSON.parse(responseText);
+                } catch (jsonError) {
+                    console.error("JSON parsing error:", jsonError);
+                    throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
+                }
                 
                 // Complete the progress bar
                 clearInterval(progressInterval);
@@ -340,6 +358,12 @@
                     
                     // Check if it's a data URL (base64)
                     const isDataUrl = data.imageUrl.startsWith('data:');
+                    
+                    // Validate the image URL
+                    if (!isDataUrl && !data.imageUrl.startsWith('http')) {
+                        console.error("Invalid image URL format:", data.imageUrl);
+                        throw new Error("Invalid image URL format received from server");
+                    }
                     
                     // Display the generated image
                     resultDiv.innerHTML = `
@@ -368,6 +392,12 @@
                                 `}
                             </div>
                             ${data.message ? `<p class="message">${data.message}</p>` : ''}
+                            <div class="debug-info" style="display: block;">
+                                <strong>Debug Info:</strong><br>
+                                Response Status: ${response.status}<br>
+                                ${data.error ? `Error: ${data.error}<br>` : ''}
+                                ${data.message ? `Message: ${data.message}<br>` : ''}
+                            </div>
                         </div>
                     `;
                 } else {
@@ -377,7 +407,22 @@
             } catch (error) {
                 clearInterval(progressInterval);
                 console.error('Error:', error);
-                resultDiv.innerHTML = `<p class="error">Error: ${error.message || 'Something went wrong'}</p>`;
+                
+                // Show more detailed error information
+                let errorDetails = error.message || 'Something went wrong';
+                if (error.stack) {
+                    console.error('Error stack:', error.stack);
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="anime-border">
+                        <p class="error">Error: ${errorDetails}</p>
+                        <div class="debug-info" style="display: block;">
+                            <strong>Error Details:</strong><br>
+                            ${error.stack ? error.stack.replace(/\n/g, '<br>') : errorDetails}
+                        </div>
+                    </div>
+                `;
             } finally {
                 // Re-enable button and hide progress area
                 generateButton.disabled = false;
