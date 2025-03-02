@@ -333,20 +333,16 @@
                     },
                     body: JSON.stringify({
                         model: "flux-dev",
-                        prompt: `A colorful Miyazaki/Studio Ghibli style illustration celebrating ${celebration}. 
+                        prompt: `Hayao Miyazaki and Studio Ghibli style Japanese anime illustration depicting ${celebration}.
 
-The scene features a bright teal blue sky with fluffy white clouds, vibrant yellow fields of flowers, and green mountains in the background.
+A red banner at the top of the image with clear white text that reads: "${greeting}"
 
-At the top of the image, there is a red banner with white text that reads: "${greeting}"
-
-The main character, ${person}, is shown celebrating ${celebration} with friends in Ghibli style. The characters are engaged in activities specific to this celebration type.
-
-The illustration has the whimsical, magical quality of Studio Ghibli films with clean lines and vibrant colors.`,
-                        negative_prompt: "blurry, low quality, missing text, incorrect text, banner at bottom, 3D, photorealistic, missing banner, text unreadable, text cut off, banner too small, banner wrong color",
+The scene features ${person} and friends with the magical and whimsical quality of Studio Ghibli films.`,
+                        negative_prompt: "blurry, low quality, missing text, incorrect text, unreadable text, text cut off, missing banner",
                         height: 720,
                         width: 1280,
-                        steps: 15, // Reduced from 20 to 15 for faster processing
-                        cfg_scale: 8, // Slightly reduced from 9 to 8
+                        steps: 20,
+                        cfg_scale: 9,
                         seed: randomSeed,
                         safe_mode: false,
                         return_binary: false,
