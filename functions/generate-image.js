@@ -43,12 +43,14 @@ exports.handler = async function(event, context) {
         },
         data: {
           model: "fluently-xl",
-          prompt: `A vibrant Japanese anime-style illustration depicting a joyful ${celebration} scene. The setting reflects the theme of the celebration, with appropriate decorations, colors, and background elements. The main character, representing ${person}, is drawn in a detailed and expressive Japanese anime style, reminiscent of classic 70s anime, with natural proportions, soft shading, and a nostalgic, hand-drawn aesthetic.
+          prompt: `A Japanese anime-style illustration in a nostalgic 70s anime aesthetic celebrating ${celebration}. The scene should match the celebration, featuring appropriate decorations and joyful expressions.
 
-A large, clear banner is prominently displayed at the top of the image, with the exact text: '${greeting}' in a bold, legible, and aesthetically fitting font. The text should be completely clear and readable.
+At the top of the image, a large, bold banner should clearly display the text: "${greeting}" in a white, bold, sans-serif font on a solid red background. The banner should span the entire width of the image at the top, exactly like a header. The text should be highly legible, centered, and properly spaced.
 
-The overall scene should fully capture the spirit of the celebration—such as balloons and a lively party for birthdays, a romantic setting for anniversaries, or confetti and applause for achievements. The colors, expressions, and atmosphere should evoke warmth, joy, and excitement, staying true to the nostalgic Japanese anime style with realistic character proportions.`,
-          negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text, text that is hard to read, banner at bottom, multiple banners, split text, exaggerated features, large eyes, chibi style",
+The main character, ${person}, should be featured prominently, engaging in a relevant action that reflects the celebration. The colors should be vibrant, the expressions joyful, and the setting immersive to fully capture the festive spirit. The style should be reminiscent of classic 70s anime with natural proportions and clean lines.
+
+Reference: The banner should look exactly like the example with a solid red rectangular banner at the top with white text.`,
+          negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text, text that is hard to read, banner at bottom, multiple banners, split text, exaggerated features, large eyes, chibi style, wavy banner, decorative banner",
           height: 720,
           width: 1280,
           steps: 20,
