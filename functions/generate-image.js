@@ -43,17 +43,19 @@ exports.handler = async function(event, context) {
         },
         data: {
           model: "fluently-xl",
-          prompt: `A Japanese anime-style illustration in a nostalgic 70s anime aesthetic celebrating ${celebration}. The scene should match the celebration, featuring appropriate decorations and joyful expressions.
+          prompt: `A Japanese anime-style illustration in a nostalgic 70s anime aesthetic, celebrating ${celebration}. The scene must match the celebration theme, featuring relevant decorations, vibrant colors, and expressive characters.
 
-At the top of the image, a large, bold banner should clearly display the text: "${greeting}" in a white, bold, sans-serif font on a solid red background. The banner should span the entire width of the image at the top, exactly like a header. The text should be highly legible, centered, and properly spaced.
+A large, clear rectangular banner must be placed at the very top of the image, spanning the entire width. The background of the banner should be a solid red color, and the text should be in bold, white, sans-serif font, centered clearly. The exact text on the banner must be:
 
-The main character, ${person}, should be featured prominently, engaging in a relevant action that reflects the celebration. The colors should be vibrant, the expressions joyful, and the setting immersive to fully capture the festive spirit. The style should be reminiscent of classic 70s anime with natural proportions and clean lines.
+➡️ '${greeting}'
 
-Reference: The banner should look exactly like the example with a solid red rectangular banner at the top with white text.`,
-          negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text, text that is hard to read, banner at bottom, multiple banners, split text, exaggerated features, large eyes, chibi style, wavy banner, decorative banner",
+Ensure the text is fully readable, properly aligned, and does not get cut off or placed in the wrong area.
+
+The main character, ${person}, should be actively engaged in an action related to the celebration, with a scene that complements the event. The anime style should be vibrant, expressive, and true to the classic 70s Japanese anime look.`,
+          negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text, text that is hard to read, banner at bottom, multiple banners, split text, exaggerated features, large eyes, chibi style, wavy banner, decorative banner, banner in wrong position",
           height: 720,
           width: 1280,
-          steps: 20,
+          steps: 25,
           cfg_scale: 10.0,
           seed: Math.floor(Math.random() * 1000000),
           safe_mode: false,
