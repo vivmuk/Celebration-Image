@@ -214,7 +214,7 @@
             color: #333;
             text-align: left;
             white-space: pre-wrap;
-            display: block; /* Always show debug info for now */
+            display: none; /* Hide debug info by default */
         }
     </style>
 </head>
@@ -310,43 +310,52 @@
             }, 800); // Even slower updates for longer wait time
             
             try {
-                console.log("Calling serverless function...");
+                // Construct the greeting
+                const greeting = `${celebration} ${person}`;
                 
-                // Call our Netlify serverless function
-                const response = await fetch('/.netlify/functions/generate-image-background', {
+                // Your Venice API key - replace with your actual API key
+                const apiKey = "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j"; // Replace with your actual API key
+                
+                // Generate a unique timestamp and random number to prevent caching
+                const timestamp = Date.now();
+                const randomSeed = Math.floor(Math.random() * 1000000);
+                
+                console.log("Making direct API call to Venice...");
+                
+                // Make the API call to Venice for image generation
+                const veniceResponse = await fetch('https://api.venice.ai/api/v1/image/generate', {
                     method: 'POST',
                     headers: {
+                        'Authorization': `Bearer ${apiKey}`,
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Cache-Control': 'no-cache'
+                        'Cache-Control': 'no-cache',
+                        'X-Request-ID': `${timestamp}-${randomSeed}` // Add a unique request ID
                     },
                     body: JSON.stringify({
-                        celebration: celebration,
-                        person: person
+                        model: "flux-dev",
+                        prompt: `A heartwarming, hand-painted illustration in the distinctive style of Hayao Miyazaki and Studio Ghibli, celebrating ${celebration}. The scene should feature a bright teal blue sky with fluffy white clouds, vibrant yellow fields of flowers or grass, and rolling green mountains in the background. The illustration should feel dreamy, detailed, and immersive, with soft lighting and a serene, nostalgic atmosphere characteristic of Miyazaki's works.
+
+At the very top of the image, there must be a large, bold, rectangular banner spanning the entire width. The banner should have a solid red background, and the text should be in bold, white, sans-serif font, centered clearly. The exact text on the banner must be: "${greeting}"
+
+The text must be fully readable, properly aligned, and NOT obstructed by any elements in the scene.
+
+The central character, ${person}, should be actively engaged in an activity that directly relates to the ${celebration} - the character should be the clear focus of the scene. They may be surrounded by friends, animals, or magical creatures typical of Miyazaki films. The landscape may include a winding path through the yellow fields, but this should be secondary to the celebration activity. The art style should have clean lines and vibrant colors, especially focusing on the teal blue sky, yellow fields, and green mountains. The mood should feel peaceful, joyful, and nostalgic, with the whimsical and magical quality that defines Studio Ghibli films.`,
+                        negative_prompt: "blurry, low quality, missing text, incorrect text, banner at bottom, 3D, photorealistic, missing banner, text unreadable, text cut off, banner too small, banner wrong color, dark colors, orange sky, brown fields, character not celebrating",
+                        height: 720,
+                        width: 1280,
+                        steps: 10, // Reduced to 10 for faster processing
+                        cfg_scale: 8, // Balanced setting for quality and speed
+                        seed: randomSeed,
+                        safe_mode: false,
+                        return_binary: false,
+                        hide_watermark: false
                     })
                 });
                 
-                console.log("Response received:", response.status);
+                console.log("Response received:", veniceResponse.status);
                 
-                // Add better error handling for JSON parsing
-                let data;
-                try {
-                    if (!response.ok) {
-                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    const responseText = await response.text();
-                    console.log("Raw response text:", responseText);
-                    
-                    if (!responseText || responseText.trim() === '') {
-                        throw new Error('Empty response received from server');
-                    }
-                    
-                    data = JSON.parse(responseText);
-                } catch (jsonError) {
-                    console.error("JSON parsing error:", jsonError);
-                    throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
-                }
+                // Parse the response
+                const data = await veniceResponse.json();
                 
                 // Complete the progress bar
                 clearInterval(progressInterval);
@@ -355,17 +364,11 @@
                 
                 console.log("API Response:", data);
                 
-                if (data.imageUrl) {
-                    console.log("Image URL found:", data.imageUrl);
-                    
-                    // Check if it's a data URL (base64)
-                    const isDataUrl = data.imageUrl.startsWith('data:');
-                    
-                    // Validate the image URL
-                    if (!isDataUrl && !data.imageUrl.startsWith('http')) {
-                        console.error("Invalid image URL format:", data.imageUrl);
-                        throw new Error("Invalid image URL format received from server");
-                    }
+                if (data.images && data.images.length > 0) {
+                    console.log("Image found in response");
+                    const imageBase64 = data.images[0];
+                    // The API returns base64 data, so we need to construct a data URL
+                    const imageUrl = `data:image/png;base64,${imageBase64}`;
                     
                     // Display the generated image
                     resultDiv.innerHTML = `
@@ -374,63 +377,69 @@
                                 Your "${celebration} ${person}" Celebration Image:
                             </h3>
                             <div class="image-container">
-                                <img src="${data.imageUrl}" alt="${celebration} ${person} celebration image" crossorigin="anonymous">
+                                <img src="${imageUrl}" alt="${celebration} ${person} celebration image" crossorigin="anonymous">
                             </div>
                             <div style="margin-top: 20px; text-align: center;">
-                                ${isDataUrl ? `
-                                    <a href="${data.imageUrl}" download="${celebration}_${person}.png" target="_blank"
-                                       style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
-                                              text-decoration: none; border-radius: 10px; font-family: 'Bangers', cursive; 
-                                              font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c;">
-                                        ⬇️ DOWNLOAD IMAGE
-                                    </a>
-                                ` : `
-                                    <a href="${data.imageUrl}" target="_blank"
-                                       style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
-                                              text-decoration: none; border-radius: 10px; font-family: 'Bangers', cursive; 
-                                              font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c;">
-                                        🔍 VIEW FULL IMAGE
-                                    </a>
-                                `}
+                                <a href="${imageUrl}" download="${celebration}_${person}.png" target="_blank"
+                                   style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
+                                          text-decoration: none; border-radius: 10px; font-family: 'Bangers', cursive; 
+                                          font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c;">
+                                    ⬇️ DOWNLOAD IMAGE
+                                </a>
                             </div>
-                            ${data.message ? `<p class="message">${data.message}</p>` : ''}
-                            <div class="debug-info" style="display: block;">
-                                <strong>Debug Info:</strong><br>
-                                Response Status: ${response.status}<br>
-                                Response URL: ${response.url}<br>
-                                ${data.error ? `Error: ${data.error}<br>` : ''}
-                                ${data.message ? `Message: ${data.message}<br>` : ''}
-                                ${data.imageUrl ? `Image URL Type: ${data.imageUrl.substring(0, 30)}...<br>` : ''}
-                                Raw Response Length: ${responseText ? responseText.length : 'N/A'} characters<br>
-                                Function: generate-image-background
-                            </div>
+                            <p class="message">Image generated successfully!</p>
                         </div>
                     `;
                 } else {
-                    // Display error message
-                    resultDiv.innerHTML = `<p class="error">Error: ${data.error || 'Failed to generate image'}</p>`;
+                    // Fallback to placeholder image if no image in response
+                    const placeholderImageUrl = `https://picsum.photos/seed/${encodeURIComponent(greeting)}-${timestamp}/1280/720`;
+                    
+                    resultDiv.innerHTML = `
+                        <div class="anime-border">
+                            <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
+                                Your "${celebration} ${person}" Celebration Image:
+                            </h3>
+                            <div class="image-container">
+                                <img src="${placeholderImageUrl}" alt="${celebration} ${person} celebration image" crossorigin="anonymous">
+                            </div>
+                            <div style="margin-top: 20px; text-align: center;">
+                                <a href="${placeholderImageUrl}" target="_blank"
+                                   style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
+                                          text-decoration: none; border-radius: 10px; font-family: 'Bangers', cursive; 
+                                          font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c;">
+                                    🔍 VIEW FULL IMAGE
+                                </a>
+                            </div>
+                            <p class="message">Using a placeholder image. The Venice API did not return an image.</p>
+                        </div>
+                    `;
                 }
             } catch (error) {
                 clearInterval(progressInterval);
                 console.error('Error:', error);
                 
-                // Show more detailed error information
-                let errorDetails = error.message || 'Something went wrong';
-                if (error.stack) {
-                    console.error('Error stack:', error.stack);
-                }
+                // Fallback to placeholder image on error
+                const timestamp = Date.now();
+                const placeholderImageUrl = `https://picsum.photos/seed/${timestamp}/1280/720`;
                 
                 resultDiv.innerHTML = `
                     <div class="anime-border">
-                        <p class="error">Error: ${errorDetails}</p>
-                        <div class="debug-info" style="display: block;">
-                            <strong>Error Details:</strong><br>
-                            Error Message: ${errorDetails}<br>
-                            Response Status: ${response ? response.status : 'N/A'}<br>
-                            Response URL: ${response ? response.url : 'N/A'}<br>
-                            Function: generate-image-background<br>
-                            ${error.stack ? error.stack.replace(/\n/g, '<br>') : errorDetails}
+                        <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
+                            Your "${celebration} ${person}" Celebration Image:
+                        </h3>
+                        <div class="image-container">
+                            <img src="${placeholderImageUrl}" alt="${celebration} ${person} celebration image" crossorigin="anonymous">
                         </div>
+                        <div style="margin-top: 20px; text-align: center;">
+                            <a href="${placeholderImageUrl}" target="_blank"
+                               style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
+                                      text-decoration: none; border-radius: 10px; font-family: 'Bangers', cursive; 
+                                      font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c;">
+                                🔍 VIEW FULL IMAGE
+                            </a>
+                        </div>
+                        <p class="error">Error: ${error.message || 'Something went wrong'}</p>
+                        <p class="message">Using a placeholder image due to error.</p>
                     </div>
                 `;
             } finally {
