@@ -42,12 +42,12 @@ exports.handler = async function(event, context) {
           'Content-Type': 'application/json'
         },
         data: {
-          model: "sdxl",
+          model: "fluently-xl",
           prompt: `A 70s anime style illustration of characters celebrating "${celebration}". At the very top of the image is a large, prominent banner with the EXACT text "${greeting}" written on it in bold, clear letters. The text "${greeting}" must be perfectly legible and not altered in any way. The banner spans across the top of the image. The scene shows anime characters in 70s style celebrating with vibrant colors.`,
           negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text, text that does not match '${greeting}', banner at bottom, multiple banners",
           height: 720,
           width: 1280,
-          steps: 20,
+          steps: 15,
           cfg_scale: 9.0,
           seed: Math.floor(Math.random() * 1000000),
           safe_mode: false,
