@@ -43,19 +43,19 @@ exports.handler = async function(event, context) {
         },
         data: {
           model: "fluently-xl",
-          prompt: `A Japanese anime-style illustration in a nostalgic 70s anime aesthetic, celebrating ${celebration}. The scene must match the celebration theme, featuring relevant decorations, vibrant colors, and expressive characters.
+          prompt: `A heartwarming, hand-painted Studio Ghibli-style illustration celebrating ${celebration}. The scene should feel dreamy, detailed, and immersive, with soft lighting, lush environments, and a cozy, nostalgic atmosphere, characteristic of Hayao Miyazaki's iconic movies.
 
-A large, clear rectangular banner must be placed at the very top of the image, spanning the entire width. The background of the banner should be a solid red color, and the text should be in bold, white, sans-serif font, centered clearly. The exact text on the banner must be:
+At the very top of the image, there must be a large, bold, rectangular banner spanning the entire width. The banner should have a solid red background, and the text should be in bold, white, sans-serif font, centered clearly. The exact text on the banner must be:
 
 ➡️ '${greeting}'
 
-Ensure the text is fully readable, properly aligned, and does not get cut off or placed in the wrong area.
+The text must be fully readable, properly aligned, and NOT obstructed by any elements in the scene.
 
-The main character, ${person}, should be actively engaged in an action related to the celebration, with a scene that complements the event. The anime style should be vibrant, expressive, and true to the classic 70s Japanese anime look.`,
-          negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text, text that is hard to read, banner at bottom, multiple banners, split text, exaggerated features, large eyes, chibi style, wavy banner, decorative banner, banner in wrong position",
+The central character, ${person}, should be depicted engaging in an activity that reflects the celebration, surrounded by a magical, detailed environment filled with whimsical details, soft brush strokes, and rich color palettes typical of Studio Ghibli films. The mood should feel serene, joyful, and nostalgic, capturing the warmth and artistic richness of Miyazaki's works.`,
+          negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text, text that is hard to read, banner at bottom, multiple banners, split text, exaggerated features, large eyes, chibi style, wavy banner, decorative banner, banner in wrong position, text obstructed, anime style that is not Ghibli",
           height: 720,
           width: 1280,
-          steps: 25,
+          steps: 30,
           cfg_scale: 10.0,
           seed: Math.floor(Math.random() * 1000000),
           safe_mode: false,
