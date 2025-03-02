@@ -238,7 +238,7 @@
                 <div class="progress-text" id="progress-text">0%</div>
             </div>
             <div class="loading-message" id="loading-message">
-                Creating your groovy anime image... This might take up to 30 seconds!
+                Creating your groovy anime image... This might take up to 2 minutes!
             </div>
         </div>
     </div>
@@ -272,10 +272,10 @@
             
             // Set up messages for longer wait times
             const loadingMessages = [
-                "Creating your groovy anime image... This might take up to 30 seconds!",
-                "Still working on your masterpiece... Anime art takes time!",
-                "Almost there! Adding those vintage 70s vibes...",
-                "Putting the finishing touches on your celebration image..."
+                "Creating your groovy anime image... This might take up to 2 minutes!",
+                "Still working on your masterpiece... 70s anime art with high quality takes time!",
+                "Almost there! Adding those vintage 70s vibes with extra detail...",
+                "Putting the finishing touches on your celebration image... The wait will be worth it!"
             ];
             
             // Simulate progress since we can't get real-time progress from the API
@@ -283,15 +283,15 @@
             let messageIndex = 0;
             
             const progressInterval = setInterval(() => {
-                // Gradually increase progress
+                // Gradually increase progress - even slower now for 20 steps
                 if (progress < 20) {
-                    progress += 0.5;
-                } else if (progress < 60) {
-                    progress += 0.3;
-                } else if (progress < 90) {
                     progress += 0.1;
+                } else if (progress < 60) {
+                    progress += 0.08;
+                } else if (progress < 90) {
+                    progress += 0.03;
                 } else {
-                    progress += 0.05;
+                    progress += 0.01;
                 }
                 
                 if (progress > 95) {
@@ -302,18 +302,18 @@
                 progressBar.style.width = progress + '%';
                 progressText.innerText = Math.round(progress) + '%';
                 
-                // Update loading message every 7 seconds
+                // Update loading message every 25 seconds
                 if (Math.floor(progress / 25) > messageIndex && messageIndex < loadingMessages.length - 1) {
                     messageIndex++;
                     loadingMessage.textContent = loadingMessages[messageIndex];
                 }
-            }, 300);
+            }, 800); // Even slower updates for longer wait time
             
             try {
                 console.log("Calling serverless function...");
                 
                 // Call our Netlify serverless function
-                const response = await fetch('/.netlify/functions/generate-image', {
+                const response = await fetch('/.netlify/functions/generate-image-background', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
