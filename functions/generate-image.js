@@ -55,7 +55,7 @@ The central character, ${person}, should be depicted engaging in an activity tha
           negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text, text that is hard to read, banner at bottom, multiple banners, split text, exaggerated features, large eyes, chibi style, wavy banner, decorative banner, banner in wrong position, text obstructed, anime style that is not Ghibli",
           height: 720,
           width: 1280,
-          steps: 30,
+          steps: 23,
           cfg_scale: 10.0,
           seed: Math.floor(Math.random() * 1000000),
           safe_mode: false,
