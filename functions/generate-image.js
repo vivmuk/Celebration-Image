@@ -42,21 +42,17 @@ exports.handler = async function(event, context) {
           'Content-Type': 'application/json'
         },
         data: {
-          model: "fluently-xl",
-          prompt: `A heartwarming, hand-painted Studio Ghibli-style illustration celebrating ${celebration}. The scene should feel dreamy, detailed, and immersive, with soft lighting, lush environments, and a cozy, nostalgic atmosphere, characteristic of Hayao Miyazaki's iconic movies.
+          model: "sdxl",
+          prompt: `Studio Ghibli-style illustration of a ${celebration} celebration. Soft lighting, dreamy atmosphere, and whimsical details.
 
-At the very top of the image, there must be a large, bold, rectangular banner spanning the entire width. The banner should have a solid red background, and the text should be in bold, white, sans-serif font, centered clearly. The exact text on the banner must be:
+A red rectangular banner at the top of the image with white text that reads "${greeting}".
 
-➡️ '${greeting}'
-
-The text must be fully readable, properly aligned, and NOT obstructed by any elements in the scene.
-
-The central character, ${person}, should be depicted engaging in an activity that reflects the celebration, surrounded by a magical, detailed environment filled with whimsical details, soft brush strokes, and rich color palettes typical of Studio Ghibli films. The mood should feel serene, joyful, and nostalgic, capturing the warmth and artistic richness of Miyazaki's works.`,
-          negative_prompt: "blurry, low quality, missing text, incorrect text, misspelled text, wrong text, text that is hard to read, banner at bottom, multiple banners, split text, exaggerated features, large eyes, chibi style, wavy banner, decorative banner, banner in wrong position, text obstructed, anime style that is not Ghibli",
+The character ${person} is celebrating in a magical environment with Miyazaki-inspired scenery.`,
+          negative_prompt: "blurry, low quality, missing text, incorrect text, banner at bottom, text obstructed",
           height: 720,
           width: 1280,
-          steps: 23,
-          cfg_scale: 10.0,
+          steps: 20,
+          cfg_scale: 8.0,
           seed: Math.floor(Math.random() * 1000000),
           safe_mode: false,
           return_binary: false,
