@@ -51,8 +51,8 @@ The character ${person} is celebrating in a magical environment with Miyazaki-in
           negative_prompt: "blurry, low quality, missing text, incorrect text, banner at bottom, text obstructed, distant wide shot",
           height: 720,
           width: 1280,
-          steps: 15, // Reduced from 20 to 15 for faster generation
-          cfg_scale: 7.5, // Adjusted for better balance
+          steps: 20, // Increased back to 20 for better quality
+          cfg_scale: 9, // Changed to 9 for better balance between adherence and creativity
           seed: Math.floor(Math.random() * 1000000),
           safe_mode: false,
           return_binary: false,
