@@ -29,11 +29,25 @@ exports.handler = async function(event, context) {
     // Your Venice API key - use environment variable if available
     const apiKey = process.env.VENICE_API_KEY || "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j";
     
+    // Check if API key looks valid
+    if (!apiKey || apiKey === "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j") {
+      console.warn("Warning: Using default API key. This may not work properly. Please set your own API key as an environment variable.");
+    }
+    
     console.log("Making API call to Venice with greeting:", greeting);
     
     // Make the API call to Venice for image generation
     try {
-      // Try with a different model - sdxl is more widely supported
+      // Try with flux-dev model
+      console.log("Preparing to call Venice API with the following data:", JSON.stringify({
+        model: "flux-dev",
+        prompt_summary: "Studio Ghibli-style celebration with banner",
+        height: 720,
+        width: 1280,
+        steps: 20,
+        cfg_scale: 9
+      }));
+      
       const veniceResponse = await axios({
         method: 'post',
         url: 'https://api.venice.ai/api/v1/image/generate',
@@ -64,8 +78,13 @@ The character ${person} is celebrating in a magical environment with Miyazaki-in
       console.log("Venice API response status:", veniceResponse.status);
       console.log("Venice API response headers:", JSON.stringify(veniceResponse.headers));
       
+      // Log the full response data to see what's coming back
+      console.log("Venice API response data structure:", Object.keys(veniceResponse.data));
+      console.log("Venice API response data preview:", JSON.stringify(veniceResponse.data).substring(0, 300) + "...");
+      
       // Check if we have images in the response
       if (veniceResponse.data && veniceResponse.data.images && veniceResponse.data.images.length > 0) {
+        console.log("Image found in response, image data length:", veniceResponse.data.images[0].length);
         const imageBase64 = veniceResponse.data.images[0];
         // The API returns base64 data, so we need to construct a data URL
         const imageUrl = `data:image/png;base64,${imageBase64}`;
@@ -79,7 +98,7 @@ The character ${person} is celebrating in a magical environment with Miyazaki-in
           })
         };
       } else {
-        console.log("No images found in Venice API response:", JSON.stringify(veniceResponse.data));
+        console.log("No images found in Venice API response. Full response:", JSON.stringify(veniceResponse.data));
         
         // Fallback to placeholder image
         const placeholderImageUrl = `https://picsum.photos/seed/${encodeURIComponent(greeting)}/1280/720`;
@@ -98,7 +117,14 @@ The character ${person} is celebrating in a magical environment with Miyazaki-in
       
       // If we have a response from the API, log it
       if (apiError.response) {
-        console.error("Venice API error response:", JSON.stringify(apiError.response.data));
+        console.error("Venice API error response status:", apiError.response.status);
+        console.error("Venice API error response data:", JSON.stringify(apiError.response.data));
+      } else if (apiError.request) {
+        // The request was made but no response was received
+        console.error("Venice API no response received. Request:", apiError.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Venice API error setup:", apiError.message);
       }
       
       // Fallback to placeholder image
