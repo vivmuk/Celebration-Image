@@ -8,6 +8,12 @@
 [functions.generate-image]
   timeout = 30
 
+[functions.generate-image-background]
+  included_files = ["node_modules/axios/**"]
+  external_node_modules = ["axios"]
+  background = true
+  timeout = 300
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

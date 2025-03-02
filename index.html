@@ -214,7 +214,7 @@
             color: #333;
             text-align: left;
             white-space: pre-wrap;
-            display: none;
+            display: block; /* Always show debug info for now */
         }
     </style>
 </head>
@@ -316,7 +316,9 @@
                 const response = await fetch('/.netlify/functions/generate-image-background', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
                     },
                     body: JSON.stringify({
                         celebration: celebration,
@@ -395,8 +397,12 @@
                             <div class="debug-info" style="display: block;">
                                 <strong>Debug Info:</strong><br>
                                 Response Status: ${response.status}<br>
+                                Response URL: ${response.url}<br>
                                 ${data.error ? `Error: ${data.error}<br>` : ''}
                                 ${data.message ? `Message: ${data.message}<br>` : ''}
+                                ${data.imageUrl ? `Image URL Type: ${data.imageUrl.substring(0, 30)}...<br>` : ''}
+                                Raw Response Length: ${responseText ? responseText.length : 'N/A'} characters<br>
+                                Function: generate-image-background
                             </div>
                         </div>
                     `;
@@ -419,6 +425,10 @@
                         <p class="error">Error: ${errorDetails}</p>
                         <div class="debug-info" style="display: block;">
                             <strong>Error Details:</strong><br>
+                            Error Message: ${errorDetails}<br>
+                            Response Status: ${response ? response.status : 'N/A'}<br>
+                            Response URL: ${response ? response.url : 'N/A'}<br>
+                            Function: generate-image-background<br>
                             ${error.stack ? error.stack.replace(/\n/g, '<br>') : errorDetails}
                         </div>
                     </div>
