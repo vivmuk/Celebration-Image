@@ -46,10 +46,10 @@ exports.handler = async function(event, context) {
       
       console.log("Preparing to call Venice API with the following data:", JSON.stringify({
         model: "flux-dev",
-        prompt_summary: "70s anime celebration",
+        prompt_summary: "Heartwarming Miyazaki/Ghibli-inspired celebration with teal skies and yellow fields",
         height: 720,
         width: 1280,
-        steps: 10, // Increased back to 10 for better quality since we have more time
+        steps: 20, // Increased to 20 for higher quality images
         cfg_scale: 8, // Balanced setting for quality and speed
         seed: randomSeed
       }));
@@ -66,26 +66,37 @@ exports.handler = async function(event, context) {
         },
         data: {
           model: "flux-dev",
-          prompt: `70s anime-style illustration of a ${celebration} celebration. Vibrant colors, retro aesthetic.
+          prompt: `A heartwarming, hand-painted illustration in the distinctive style of Hayao Miyazaki and Studio Ghibli, celebrating ${celebration}. The scene should feature a bright teal blue sky with fluffy white clouds, vibrant yellow fields of flowers or grass, and rolling green mountains in the background. The illustration should feel dreamy, detailed, and immersive, with soft lighting and a serene, nostalgic atmosphere characteristic of Miyazaki's works.
 
-A red banner at the top with white text that reads "${greeting}".
+At the very top of the image, there must be a large, bold, rectangular banner spanning the entire width. The banner should have a solid red background, and the text should be in bold, white, sans-serif font, centered clearly. The exact text on the banner must be: "${greeting}"
 
-The character ${person} is celebrating with friends in a 1970s anime style.`,
-          negative_prompt: "blurry, low quality, missing text, incorrect text",
+The text must be fully readable, properly aligned, and NOT obstructed by any elements in the scene.
+
+The central character, ${person}, should be actively engaged in an activity that directly relates to the ${celebration} - the character should be the clear focus of the scene. They may be surrounded by friends, animals, or magical creatures typical of Miyazaki films. The landscape may include a winding path through the yellow fields, but this should be secondary to the celebration activity. The art style should have clean lines and vibrant colors, especially focusing on the teal blue sky, yellow fields, and green mountains. The mood should feel peaceful, joyful, and nostalgic, with the whimsical and magical quality that defines Studio Ghibli films.`,
+          negative_prompt: "blurry, low quality, missing text, incorrect text, banner at bottom, 3D, photorealistic, missing banner, text unreadable, text cut off, banner too small, banner wrong color, dark colors, orange sky, brown fields, character not celebrating",
           height: 720,
           width: 1280,
-          steps: 10, // Increased back to 10 for better quality since we have more time
+          steps: 20, // Increased to 20 for higher quality images
           cfg_scale: 8, // Balanced setting for quality and speed
           seed: randomSeed,
           safe_mode: false,
           return_binary: false,
           hide_watermark: false
         },
-        timeout: 60000 // 60 seconds timeout since we're a background function
+        timeout: 120000 // 120 seconds (2 minutes) timeout for 20 steps
       });
       
       console.log("Venice API response status:", veniceResponse.status);
       console.log("Venice API response data structure:", Object.keys(veniceResponse.data));
+      
+      // Add more detailed logging
+      if (veniceResponse.data) {
+        console.log("Response data type:", typeof veniceResponse.data);
+        console.log("Response has images property:", veniceResponse.data.hasOwnProperty('images'));
+        if (veniceResponse.data.images) {
+          console.log("Images array length:", veniceResponse.data.images.length);
+        }
+      }
       
       // Check if we have images in the response
       if (veniceResponse.data && veniceResponse.data.images && veniceResponse.data.images.length > 0) {
@@ -96,6 +107,9 @@ The character ${person} is celebrating with friends in a 1970s anime style.`,
         
         return {
           statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({ 
             imageUrl: imageUrl,
             greeting: greeting,
@@ -110,6 +124,9 @@ The character ${person} is celebrating with friends in a 1970s anime style.`,
         
         return {
           statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({ 
             imageUrl: placeholderImageUrl,
             greeting: greeting,
@@ -143,6 +160,9 @@ The character ${person} is celebrating with friends in a 1970s anime style.`,
       
       return {
         statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ 
           imageUrl: placeholderImageUrl,
           greeting: greeting,
@@ -159,6 +179,9 @@ The character ${person} is celebrating with friends in a 1970s anime style.`,
     
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ 
         imageUrl: placeholderImageUrl,
         error: 'Failed to process request: ' + error.message,
