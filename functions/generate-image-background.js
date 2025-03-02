@@ -95,6 +95,10 @@ The central character, ${person}, should be actively engaged in an activity that
         console.log("Response has images property:", veniceResponse.data.hasOwnProperty('images'));
         if (veniceResponse.data.images) {
           console.log("Images array length:", veniceResponse.data.images.length);
+          if (veniceResponse.data.images.length > 0) {
+            console.log("First image type:", typeof veniceResponse.data.images[0]);
+            console.log("First image starts with:", veniceResponse.data.images[0].substring(0, 20) + "...");
+          }
         }
       }
       
@@ -108,7 +112,10 @@ The central character, ${person}, should be actively engaged in an activity that
         return {
           statusCode: 200,
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Cache-Control': 'no-store'
           },
           body: JSON.stringify({ 
             imageUrl: imageUrl,
@@ -125,7 +132,10 @@ The central character, ${person}, should be actively engaged in an activity that
         return {
           statusCode: 200,
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Cache-Control': 'no-store'
           },
           body: JSON.stringify({ 
             imageUrl: placeholderImageUrl,
@@ -161,7 +171,10 @@ The central character, ${person}, should be actively engaged in an activity that
       return {
         statusCode: 200,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Cache-Control': 'no-store'
         },
         body: JSON.stringify({ 
           imageUrl: placeholderImageUrl,
@@ -180,7 +193,10 @@ The central character, ${person}, should be actively engaged in an activity that
     return {
       statusCode: 500,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Cache-Control': 'no-store'
       },
       body: JSON.stringify({ 
         imageUrl: placeholderImageUrl,

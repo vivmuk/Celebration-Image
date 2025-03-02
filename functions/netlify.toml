@@ -1,0 +1,8 @@
+[functions]
+  node_bundler = "esbuild"
+  
+[functions.generate-image-background]
+  included_files = ["node_modules/axios/**"]
+  external_node_modules = ["axios"]
+  background = true
+  timeout = 300 
