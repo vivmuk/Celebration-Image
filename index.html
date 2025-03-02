@@ -246,8 +246,11 @@
     <div id="result"></div>
 
     <script>
-        document.getElementById('generate').addEventListener('click', async function() {
-            const generateButton = document.getElementById('generate');
+        // Use modern event listener approach
+        const generateButton = document.getElementById('generate');
+        
+        // Add event listener using the modern approach
+        generateButton.addEventListener('click', async function() {
             const celebration = document.getElementById('celebration').value.trim();
             const person = document.getElementById('person').value.trim();
             const resultDiv = document.getElementById('result');
@@ -325,14 +328,59 @@
                 
                 const data = await response.json();
                 
-                // Complete the progress bar
-                clearInterval(progressInterval);
-                progressBar.style.width = '100%';
-                progressText.innerText = '100%';
-                
                 console.log("API Response:", data);
                 
-                if (data.imageUrl) {
+                // Check if the response indicates processing status
+                if (data.status === "processing") {
+                    // Keep the progress bar going
+                    loadingMessage.textContent = "Image is being generated in the background. Using a placeholder for now...";
+                    
+                    // Display the placeholder image
+                    resultDiv.innerHTML = `
+                        <div class="anime-border">
+                            <h3 style="color: #ff6347; font-family: 'Bangers', cursive; font-size: 2em; text-align: center; margin-bottom: 20px;">
+                                Your "${celebration} ${person}" Celebration Image (Processing):
+                            </h3>
+                            <div class="image-container">
+                                <img src="${data.imageUrl}" alt="${celebration} ${person} celebration image" crossorigin="anonymous">
+                            </div>
+                            <div style="margin-top: 20px; text-align: center;">
+                                <button id="refresh-image" style="display: inline-block; padding: 10px 20px; background-color: #ff6347; color: white; 
+                                       text-decoration: none; border: none; border-radius: 10px; font-family: 'Bangers', cursive; 
+                                       font-size: 18px; letter-spacing: 1px; box-shadow: 0 3px 0 #cd5c5c; cursor: pointer;">
+                                    🔄 REFRESH IMAGE
+                                </button>
+                            </div>
+                            <p class="message">${data.message}</p>
+                        </div>
+                    `;
+                    
+                    // Add event listener to the refresh button
+                    document.getElementById('refresh-image').addEventListener('click', function() {
+                        // Re-enable the generate button
+                        generateButton.disabled = false;
+                        // Hide progress area
+                        progressArea.style.display = 'none';
+                        // Clear the result
+                        resultDiv.innerHTML = '';
+                        // Trigger the generate button click
+                        generateButton.click();
+                    });
+                    
+                    // Complete the progress bar
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    progressText.innerText = '100%';
+                    
+                    // Re-enable button after showing the placeholder
+                    generateButton.disabled = false;
+                    
+                } else if (data.imageUrl) {
+                    // Complete the progress bar
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    progressText.innerText = '100%';
+                    
                     console.log("Image URL found:", data.imageUrl);
                     
                     // Check if it's a data URL (base64)
