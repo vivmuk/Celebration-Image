@@ -15,7 +15,7 @@ exports.handler = async function(event, context) {
   try {
     // Parse the request body
     const body = JSON.parse(event.body);
-    const { celebration, person } = body;
+    const { celebration, person, model } = body;
     
     // Validate inputs
     if (!celebration || !person) {
@@ -25,6 +25,13 @@ exports.handler = async function(event, context) {
       };
     }
     
+    // Model selection: validate against the live Venice lineup (flux-dev was retired).
+    // Text-capable models render the banner text reliably.
+    const TEXT_CAPABLE = ['nano-banana-2', 'gpt-image-2', 'seedream-v4'];
+    const RES_STYLE = ['nano-banana-2', 'gpt-image-2', 'seedream-v4']; // take resolution/aspect_ratio
+    const SUPPORTED = ['nano-banana-2', 'gpt-image-2', 'seedream-v4', 'z-image-turbo', 'flux-2-pro', 'recraft-v4', 'hidream', 'venice-sd35'];
+    const selectedModel = SUPPORTED.includes(model) ? model : 'nano-banana-2';
+
     // Construct the greeting - make sure to include both celebration and person
     const greeting = `${celebration} ${person}`;
     
@@ -45,7 +52,7 @@ exports.handler = async function(event, context) {
       const randomSeed = Math.floor(Math.random() * 1000000);
       
       console.log("Preparing to call Venice API with the following data:", JSON.stringify({
-        model: "flux-dev",
+        model: selectedModel,
         prompt_summary: "Heartwarming Miyazaki/Ghibli-inspired celebration with teal skies and yellow fields",
         height: 720,
         width: 1280,
@@ -65,7 +72,7 @@ exports.handler = async function(event, context) {
           'X-Request-ID': `${timestamp}-${randomSeed}` // Add a unique request ID
         },
         data: {
-          model: "flux-dev",
+          model: selectedModel,
           prompt: `A heartwarming, hand-painted illustration in the distinctive style of Hayao Miyazaki and Studio Ghibli, celebrating ${celebration}. The scene should feature a bright teal blue sky with fluffy white clouds, vibrant yellow fields of flowers or grass, and rolling green mountains in the background. The illustration should feel dreamy, detailed, and immersive, with soft lighting and a serene, nostalgic atmosphere characteristic of Miyazaki's works.
 
 At the very top of the image, there must be a large, bold, rectangular banner spanning the entire width. The banner should have a solid red background, and the text should be in bold, white, sans-serif font, centered clearly. The exact text on the banner must be: "${greeting}"
@@ -73,11 +80,10 @@ At the very top of the image, there must be a large, bold, rectangular banner sp
 The text must be fully readable, properly aligned, and NOT obstructed by any elements in the scene.
 
 The central character, ${person}, should be actively engaged in an activity that directly relates to the ${celebration} - the character should be the clear focus of the scene. They may be surrounded by friends, animals, or magical creatures typical of Miyazaki films. The landscape may include a winding path through the yellow fields, but this should be secondary to the celebration activity. The art style should have clean lines and vibrant colors, especially focusing on the teal blue sky, yellow fields, and green mountains. The mood should feel peaceful, joyful, and nostalgic, with the whimsical and magical quality that defines Studio Ghibli films.`,
-          negative_prompt: "blurry, low quality, missing text, incorrect text, banner at bottom, 3D, photorealistic, missing banner, text unreadable, text cut off, banner too small, banner wrong color, dark colors, orange sky, brown fields, character not celebrating",
-          height: 720,
-          width: 1280,
-          steps: 20, // Increased to 20 for higher quality images
-          cfg_scale: 8, // Balanced setting for quality and speed
+          ...(TEXT_CAPABLE.includes(selectedModel) ? {} : { negative_prompt: "blurry, low quality, missing text, incorrect text, banner at bottom, 3D, photorealistic, missing banner, text unreadable, text cut off, banner too small, banner wrong color, dark colors, orange sky, brown fields, character not celebrating" }),
+          ...(RES_STYLE.includes(selectedModel)
+            ? { resolution: "2K", aspect_ratio: "16:9", hide_watermark: true }
+            : { width: 1280, height: 720, steps: selectedModel === 'z-image-turbo' ? 8 : 20, cfg_scale: 8, hide_watermark: false }),
           seed: randomSeed,
           safe_mode: false,
           return_binary: false,

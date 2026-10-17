@@ -267,6 +267,16 @@
         <div class="input-container">
             <input type="text" id="celebration" placeholder="Enter celebration type (e.g., Birthday, Graduation, Christmas)" value="">
             <input type="text" id="person" placeholder="Enter person's name (e.g., Vivek, Sarah, Michael)" value="">
+            <select id="model-select" style="width:100%;padding:12px;border-radius:10px;border:2px solid #4a86e8;font-size:16px;margin:6px 0;background:#fff;">
+                <option value="nano-banana-2">⭐ Nano Banana 2 — best quality, renders banner text (recommended)</option>
+                <option value="gpt-image-2">GPT Image 2 — great text rendering</option>
+                <option value="seedream-v4">Seedream v4 — sharp text, vivid color</option>
+                <option value="z-image-turbo">Z Image Turbo — fastest (no banner text)</option>
+                <option value="flux-2-pro">Flux 2 Pro — cinematic scenes (no banner text)</option>
+                <option value="recraft-v4">Recraft v4 — crisp illustration style (no banner text)</option>
+                <option value="hidream">HiDream — rich detail (no banner text)</option>
+                <option value="venice-sd35">Venice SD 3.5 — classic diffusion (no banner text)</option>
+            </select>
             <button id="generate">✨ Generate Ghibli Image ✨</button>
         </div>
         
@@ -373,6 +383,11 @@
                 // BYOK: use visitor's own key (set via ⚙ settings); no baked-in keys
                 const apiKey = window.getVeniceKey ? window.getVeniceKey() : "";
                 if (!apiKey) { window.openKeyModal("Image generation needs a Venice API key — everything else on this page works without one."); return; }
+                const model = document.getElementById('model-select').value;
+                // Text-capable models render the banner text reliably; the others use the scene as-is.
+                const textCapable = ['nano-banana-2','gpt-image-2','seedream-v4'];
+                // Parameter style: newer models take resolution/aspect_ratio; legacy diffusion takes width/height.
+                const resStyle = ['nano-banana-2','gpt-image-2','seedream-v4'];
                 
                 // Generate a unique timestamp and random number to prevent caching
                 const timestamp = Date.now();
@@ -390,7 +405,7 @@
                         'X-Request-ID': `${timestamp}-${randomSeed}` // Add a unique request ID
                     },
                     body: JSON.stringify({
-                        model: "flux-dev",
+                        model: model,
                         prompt: `Create a Hayao Miyazaki and Studio Ghibli style Japanese anime image depicting ${celebration} celebration with people.
 
 Create a medium-shot scene showing human characters from mid-torso up, with some background elements visible. The scene should be based on the ${celebration} celebration, with characters actively engaged in activities related to this specific celebration.
@@ -398,15 +413,13 @@ Create a medium-shot scene showing human characters from mid-torso up, with some
 A red banner at the top of the image with clear white text in English that reads the whole message: "${greeting}"
 
 The scene should feature human characters with realistic proportions in the signature Ghibli and Hayao Miyazaki combined art style, with a balanced composition that's not too close-up or too distant.`,
-                        negative_prompt: "blurry, low quality, missing text, incorrect text, unreadable text, text cut off, missing banner, animal characters, creatures, fantasy creatures, non-human characters, extreme close-up, faces too large",
-                        height: 720,
-                        width: 1280,
-                        steps: 20,
-                        cfg_scale: 9,
+                        ...(textCapable.includes(model) ? {} : { negative_prompt: "blurry, low quality, missing text, incorrect text, unreadable text, text cut off, missing banner, animal characters, creatures, fantasy creatures, non-human characters, extreme close-up, faces too large" }),
+                        ...(resStyle.includes(model)
+                            ? { resolution: "2K", aspect_ratio: "16:9", hide_watermark: true }
+                            : { width: 1280, height: 720, steps: model === 'z-image-turbo' ? 8 : 20, cfg_scale: 9, hide_watermark: false }),
                         seed: randomSeed,
                         safe_mode: false,
-                        return_binary: false,
-                        hide_watermark: false
+                        return_binary: false
                     })
                 });
                 
