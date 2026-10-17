@@ -29,10 +29,10 @@ exports.handler = async function(event, context) {
     const greeting = `${celebration} ${person}`;
     
     // Your Venice API key - use environment variable if available
-    const apiKey = process.env.VENICE_API_KEY || "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j";
+    const apiKey = process.env.VENICE_API_KEY;
     
     // Check if API key looks valid
-    if (!apiKey || apiKey === "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j") {
+    if (!apiKey) {
       console.warn("Warning: Using default API key. This may not work properly. Please set your own API key as an environment variable.");
     }
     

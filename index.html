@@ -370,8 +370,9 @@
                     ? `${prefix} ${celebration} ${person}!` 
                     : `${celebration} ${person}!`;
                 
-                // Your Venice API key - replace with your actual API key
-                const apiKey = "ILVaW8hCvwU85eFHtKlvfMuXYe06x7oGuU_ZetEn3j"; // Replace with your actual API key
+                // BYOK: use visitor's own key (set via ⚙ settings); no baked-in keys
+                const apiKey = window.getVeniceKey ? window.getVeniceKey() : "";
+                if (!apiKey) { window.openKeyModal("Image generation needs a Venice API key — everything else on this page works without one."); return; }
                 
                 // Generate a unique timestamp and random number to prevent caching
                 const timestamp = Date.now();
@@ -506,5 +507,6 @@ The scene should feature human characters with realistic proportions in the sign
             }
         });
     </script>
+<script src="byok.js"></script>
 </body>
 </html> 
